@@ -7,6 +7,7 @@
      console.log($('#pass').val())
      if (isEmpty($('#login').val()) != true && isEmpty($('#pass').val()) != true)
      {
+         console.log('Отправляем данные')
           $.ajax({
               url: "/login",
               method: "POST",
@@ -17,7 +18,9 @@
           },
 
            success:function(data){
+                  console.log('Применаем данные')
                if (data == 'success')
+                console.log('Все  ок')
                {$('#modfrmsignup').modal('hide')
                window.location.href ='/';}
               }
