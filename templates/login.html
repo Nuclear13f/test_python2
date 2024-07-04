@@ -20,12 +20,64 @@
 
 
 
-<form method="POST">
 
-  <div class="col mycent" >
+<form method="">
+
+    <div class="modal fade" id="modfrmsignup" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" style="width: 300px">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Войти</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+
+                      <div class="form-floating mb-3">
+              <input type="text" class="form-control" id="login" placeholder="name@example.com">
+              <label for="floatingInput">Логин</label>
+            </div>
+            <div class="form-floating">
+              <input type="password" class="form-control" id="pass" placeholder="Password">
+              <label for="floatingPassword">Пароль</label>
+            </div>
+
+
+      </div>
+      <div class="modal-footer">
+         <div class="submit-block-wrap">
+          <div class="submit-button-wrap">
+            <button class="base-0-2-79 primary-0-2-93 sign-in-systems" type="submit" style="text-align: center">
+                <span>Войти</span>
+                <div class="iconWithText-0-2-109">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="#ffffff" ie-style="fill: #ffffff;" class="base-0-2-23"><path fill-rule="evenodd" d="M12.696 7.256L9.657 4.217a1 1 0 00-1.415 1.414l1.344 1.344H3.949a1.001 1.001 0 000 2h5.637l-1.344 1.343a1.002 1.002 0 000 1.415c.391.39 1.024.39 1.415 0l3.039-3.04A.993.993 0 0013 7.975a.997.997 0 00-.293-.708l-.011-.011z"></path></svg>
+                </div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+  <div class="col mycent">
  <div class="row ">
-    <input type="password" class="col form-control" id="password"  name="password" placeholder="Введите пароль"/>
-      <button type="submit" class="col btn btn-primary mx-3">Войти</button>
+
+      <button type="submit" class="col btn btn-primary mx-3 mod-frm-sign-up" id = "mod-frm-sign-up" style="width: 150px">Войти</button>
  </div></div>
 
     <div class="col my_border" style="margin-top: 20px">
@@ -34,17 +86,28 @@
 </form>
 
 
-
+ <footer class="py-3 " style="margin-top: 500px">
+    <ul class="nav justify-content-center border-bottom pb-3 mb-3">
+    </ul>
+    <p class="text-center text-muted">© 2024 MASTER</p>
+  </footer>
 
 
 
 </div>
 
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
+
+   <script
+            type="text/javascript"
+            src="{{ url_for('static', filename='main.js') }}"
+    ></script>
+
+
 
  </body>
 </html>

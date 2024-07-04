@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify, json
 from flask_login import login_required, current_user, logout_user, login_user
 from model import users
 
@@ -18,11 +18,21 @@ def home():
 @auth.route('/login', methods=['GET','POST'])
 def login():
     if request.method == 'POST':
-        password = request.form.get('password')
-        user = users.query.filter_by(login='Sergey').first()
-        if user.password == password:
-            login_user(user, remember=True)
-            return render_template("home.html", user=current_user)
+        print('Тута')
+        # password = request.form.get('password')
+        login = request.form['login']
+        password = request.form['pass']
+        print(password)
+        print(login)
+        user = users.query.filter_by(login=login).first()
+        if user:
+            if user.password == password:
+                login_user(user, remember=True)
+                print('УРЯЯЯЯЯЯЯЯЯЯЯЯ')
+                # return render_template("home.html", user=current_user, master='GGG')
+                return jsonify('success')
+            print("Есть такой пользователь")
+        else: print('Нет такого пользователя')
 
 
 
