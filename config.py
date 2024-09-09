@@ -1,6 +1,6 @@
 from dotenv import load_dotenv, dotenv_values
-
-
+from sqlalchemy import String, create_engine, text
+from sqlalchemy.orm import Session, sessionmaker, DeclarativeBase
 
 
 class Sett():
@@ -12,3 +12,11 @@ class Sett():
                 f"{config['DB_PORT']}/{config['DB_NAME']}")
 
 settings = Sett()
+
+sync_engine = create_engine(
+    url=settings.DATABASE_URL_psycopg,
+    # echo=True,
+    )
+
+session_factory = sessionmaker(sync_engine)
+
