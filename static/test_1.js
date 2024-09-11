@@ -23,7 +23,7 @@ let res = get_stat_data();
 function load_ (self){
     let http = new XMLHttpRequest()
     let data = []
-    http.open('POST', '/unload_1/?page=2')
+    http.open('POST', '/cabinet2/?page=2')
     http.send(data)
 }
 
@@ -31,4 +31,12 @@ function load_ (self){
 $(document).on("click", '.ssaass', function () {
     alert('dddd')
     load_()
+});
+
+$(document).on("click", '.r2', function () {
+    alert('Привет')
+    let http = new XMLHttpRequest()
+    let data = []
+    http.open('POST', '/cabinet/order/')
+    http.send(data)
 });

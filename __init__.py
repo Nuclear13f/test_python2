@@ -37,9 +37,9 @@ def create_app():
 
     @login_manager.user_loader
     def load_user(id):
-        print(id)
+        # print(id)
         sas = users.query.get(int(id))
-        print(sas)
+        # print(sas)
         return users.query.get(int(id))
 
 

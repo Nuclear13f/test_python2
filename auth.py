@@ -22,6 +22,31 @@ def home():
     return render_template("home.html", user=current_user)
 
 
+@auth.route('/start/', methods=['GET', 'POST'])
+@login_required #входят только зарегистрированные пользователи
+def start():
+    dict = []
+    str = request.args.get('page')
+    print(str)
+    if str:
+        return "eeeeeeeee"
+    else: return render_template("start.html", summary="dddd")
+
+
+# def showpage():
+#     ...
+#     test = [1,2,3,4,5,6]
+#     test = json.dumps(test)
+#     return render_template("sample.html",test=test)
+#
+# In the JavaScript code:
+#
+# <script> var counts = JSON.parse("{{ test }}"); </script>
+#
+#
+
+
+
 
 @auth.route('/login/', methods=['GET','POST'])
 def login():
@@ -54,10 +79,28 @@ def logout():
     print('un reg')
     return redirect(url_for('auth.login'))
 
-@auth.route('/cabinet/<username>')
+@auth.route('/cabinet/')
+# @auth.route('/cabinet/<username>')
 def test():
-    print('username')
     return render_template('test_1.html/', client="dddd")
+
+
+@auth.route('/cabinet/order/', methods=['GET', 'POST'])
+# @auth.route('/cabinet/<username>')
+def order():
+    print('order')
+    return redirect('/cabinet/order/')
+
+
+
+@auth.route('/cabinet2/', methods=['GET', 'POST'])
+def test2():
+    str = request.args.get('username')
+    str = request.args.get('page')
+    print('Я тута')
+    print(str)
+    return redirect('/?page=')
+
 
 @auth.route('/get_stat_product', methods=['GET', 'POST'])
 @login_required
