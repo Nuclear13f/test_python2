@@ -29,7 +29,7 @@ def start():
     str = request.args.get('page')
     print(str)
     if str:
-        return "eeeeeeeee"
+        return {"page": "fff"}
     else: return render_template("start.html", summary="dddd")
 
 

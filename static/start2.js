@@ -13,3 +13,11 @@ $(document).on("click", '.r2', function () {
     http.open('POST', '/start/?page=2')
     http.send(data)
 });
+
+function start(){
+    let http = new XMLHttpRequest()
+    let data = []
+    http.open('POST', '/start/?page=1')
+    http.send(data)
+}
+start();

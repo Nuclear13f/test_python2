@@ -15,5 +15,4 @@ site.insertAdjacentHTML('beforeend', html)
 html = '<div id="content" class="content"></div>'
 site.insertAdjacentHTML('beforeend', html)
 
-
 console.log(site)
