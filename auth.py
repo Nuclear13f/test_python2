@@ -21,16 +21,26 @@ def home():
     print('home')
     return render_template("home.html", user=current_user)
 
-
-@auth.route('/start/', methods=['GET', 'POST'])
+# @auth.route('/start/', defaults={'page': 1})
+@auth.route('/start/', methods=['GET'])
 @login_required #входят только зарегистрированные пользователи
 def start():
-    dict = []
-    str = request.args.get('page')
-    print(str)
-    if str:
-        return {"page": "fff"}
-    else: return render_template("start.html", summary="dddd")
+    test = [1,2,3,4,5,6]
+    # page = request.args.get('page', 1, type=int)
+    # print(str)
+    # if str:
+    #     return {"page": "fff"}
+    print(request.args.get('page'))
+    if int(request.args.get('page')) > 1:
+        return "ddddd"
+    else:
+        return render_template("start.html", test = test)
+
+@auth.route('/events/')
+@login_required
+def events():
+    return render_template('events.html/', client="dddd")
+
 
 
 # def showpage():
