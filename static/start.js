@@ -15,4 +15,10 @@ site.insertAdjacentHTML('beforeend', html)
 html = '<div id="content" class="content"></div>'
 site.insertAdjacentHTML('beforeend', html)
 
-console.log(site)
+let elem_div = document.createElement('div')
+elem_div.classList.add('site2')
+elem_div.id = "site2"
+site.append(elem_div)
+
+
+

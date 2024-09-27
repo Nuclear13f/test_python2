@@ -22,24 +22,29 @@ def home():
     return render_template("home.html", user=current_user)
 
 # @auth.route('/start/', defaults={'page': 1})
-@auth.route('/start/', methods=['GET'])
+@auth.route('/start/', methods=['GET', 'POST'])
 @login_required #входят только зарегистрированные пользователи
 def start():
-    test = [1,2,3,4,5,6]
+
+    return render_template("start.html", test=test)
     # page = request.args.get('page', 1, type=int)
     # print(str)
     # if str:
     #     return {"page": "fff"}
-    print(request.args.get('page'))
-    if int(request.args.get('page')) > 1:
-        return "ddddd"
-    else:
-        return render_template("start.html", test = test)
+    # print(request.args.get('page'))
+    # if int(request.args.get('page')) > 1:
+    #     return "ddddd"
+    # else:
+    #     return render_template("start.html", test = test)
 
 @auth.route('/events/')
 @login_required
 def events():
     return render_template('events.html/', client="dddd")
+
+
+
+
 
 
 
@@ -115,6 +120,11 @@ def test2():
 @auth.route('/get_stat_product', methods=['GET', 'POST'])
 @login_required
 def stat_products():
+    data = request.form
+    print(request.method)
+    print(data)
+
+
     prov = select_type_products(id)
     type = prov['type']
     s1 = prov['s1']
@@ -147,3 +157,11 @@ def unload1():
     data = request.form
     print('fsfsfsfsfsdfsdfsd')
     print(data)
+
+@auth.route('/testRequest', methods=['GET', 'POST'])
+@login_required
+def testRequest():
+    print('testRequest')
+    dict = [{'id': 1, 'name': 'Sergey'},{'id': 1, 'name': 'Dany'}]
+    return jsonify(dict)
+
