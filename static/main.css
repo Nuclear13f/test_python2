@@ -125,16 +125,17 @@ color: rgba(33,37,41, 0.65);
   justify-content: center;
 }
 
+/*................... ЧЕКБОКС................................... */
 
 .pt-checker_L {
-    /*border: 0;*/
-    /*height: 1px;*/
-    /*left: -4999px;*/
-    /*opacity: 0;*/
-    /*padding: 0;*/
-    /*position: absolute;*/
-    /*width: 1px;*/
-    /*z-index: -1*/
+    border: 0;
+    height: 1px;
+    left: -4999px;
+    opacity: 0;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+    z-index: -1
 }
 
 .pt-checkbox-label_L {
@@ -201,7 +202,8 @@ color: rgba(33,37,41, 0.65);
 }
 
 .pt-checker_L:checked~.pt-checkbox-label_L:before {
-    color: #fc3
+    /*color: #fc3*/
+    color: #ff4568
 }
 .pt-checker_L:checked~.pt-checkbox-label_L:before {
     border: none;
