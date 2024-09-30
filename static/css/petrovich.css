@@ -25702,14 +25702,14 @@ body.mobile .expense-tabs {
 }
 
 .pt-checker-tag___bRRWL {
-    /*border: 0;*/
-    /*height: 1px;*/
-    /*left: -4999px;*/
-    /*opacity: 0;*/
-    /*padding: 0;*/
-    /*position: absolute;*/
-    /*width: 1px;*/
-    /*z-index: -1*/
+    border: 0;
+    height: 1px;
+    left: -4999px;
+    opacity: 0;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+    z-index: -1
 }
 
 .pt-checkbox-label___ahKyB {
@@ -25807,7 +25807,8 @@ body.mobile .expense-tabs {
     width: 18px
 }
 
-.pt-checker-tag___bRRWL:checked~.pt-checkbox-label___ahKyB:before {
+.pt-checker-tag___bRRWL:checked~.
+:before {
     border: none;
     left: -1px;
     line-height: 16px;
