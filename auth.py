@@ -123,6 +123,8 @@ def stat_products():
     data = request.form
     print(request.method)
     print(data)
+    print(data['params'])
+    # print(data['params2'])
 
 
     prov = select_type_products(id)

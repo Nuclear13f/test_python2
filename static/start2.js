@@ -145,7 +145,7 @@ async function get_stat() {
     const result = await $.ajax({
         url: '/get_stat_product',
         method: 'post',
-        data: {params: {text: 'Текст'}},
+        data: {"params": {'id': 1, 'name':'dddd'}},
     });
     return result;
 }
