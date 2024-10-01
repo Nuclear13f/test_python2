@@ -120,11 +120,13 @@ def test2():
 @auth.route('/get_stat_product', methods=['GET', 'POST'])
 @login_required
 def stat_products():
-    data = request.form
-    print(request.method)
+    data = request.get_json()
+    print('1')
     print(data)
-    print(data['params'])
-    # print(data['params2'])
+    print(data['con'])
+    print(data['sas'])
+    dd = data['sas']
+    print(dd['s'])
 
 
     prov = select_type_products(id)

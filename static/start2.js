@@ -104,9 +104,61 @@ async function getCategory() {
             check.addEventListener('click', hClick)
         }
     )
+    let d1 = url.searchParams.getAll('type')
+    let checked_m = "";
+    let checked_i = "";
+
+    if (d1){
+        d1.forEach(s =>{
+            if (s==="material"){checked_m='checked'}
+            if (s==="instrument"){checked_i='checked'}
+        })
+    }
+
+    html = '<div><input id="checkbox-1" type="checkbox" class="pt-checker_L" name="novelty" labelhtml="[object Object]" value="material"' + checked_m + '><label for="checkbox-1" class="pt-checkbox-label_L" ><div class="filter-titte-qty ">Материал</div></label>\</div>'
+    stouts.insertAdjacentHTML('beforeend', html)
+    html = '<div><input id="checkbox-2" type="checkbox" class="pt-checker_L" name="novelty" labelhtml="[object Object]" value="instrument"' + checked_i + '><label for="checkbox-2" class="pt-checkbox-label_L" ><div class="filter-titte-qty ">Инструмент</div></label>\</div>'
+    stouts.insertAdjacentHTML('beforeend', html)
+    const check2 = await document.querySelectorAll(".pt-checker_L")
+    check2.forEach(check => {
+            check.addEventListener('click', hClick2)
+        }
+    )
+
+}
+getCategory();
+
+const hClick2 = (event) => {
+    go_stat();
+    if (event.target.checked){
+        let url = new URL(window.location)
+        url.searchParams.append("type",event.target.value)
+        window.history.replaceState(window.history.state,'',url.href)
+    }else {
+        const url = new URL(window.location.href)
+        const param = url.searchParams
+        if (param.getAll('type').length===1){
+            param.delete('type');
+            history.replaceState(history.state, '', url.href);
+        }else{
+            let str = param.getAll('type')
+            for (let i=0; i<str.length;++i) {
+                if (event.target.value===str[i]) {
+                    str.splice(i,1)
+                }
+            }
+            param.delete('type');
+            param.append('type',str[0])
+            history.replaceState(history.state, '', url.href);
+        }
+    }
 }
 
-getCategory();
+
+
+
+
+
 
 async function getProduct() {
     const data = await fetch('https://fakestoreapi.com/products')
@@ -134,7 +186,6 @@ const hClick = (event) => {
     } else {
         // window.history.pushState('2', '', '');
         const url = new URL(window.location.href)
-        console.log(url)
         url.searchParams.delete(event.target.value)
         console.log(url.href)
         history.replaceState(history.state, '', url.href);
@@ -142,10 +193,26 @@ const hClick = (event) => {
 }
 
 async function get_stat() {
+
+ const newPost =
+    {
+    "userId": 1,
+    "id": 44343433434,
+    "title": "Hellow",
+    "body": "awdawdfawsregsegsefsefsfsef",
+     "flag": true,
+     "con": ["flag1","flag2"],
+     "sas": {"s": 1, "b": 2}
+
+  }
+
+const test = JSON.stringify(newPost) //Оборочиваем в строку JSON
+
     const result = await $.ajax({
         url: '/get_stat_product',
         method: 'post',
-        data: {"params": {'id': 1, 'name':'dddd'}},
+        contentType: 'application/json',
+        data:  test,
     });
     return result;
 }
