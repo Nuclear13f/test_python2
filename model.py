@@ -2,7 +2,7 @@ from __init__ import db
 from flask_login import UserMixin
 from sqlalchemy import Table, Column, Integer, String, MetaData, Boolean, func, ForeignKey, DateTime, Float
 from sqlalchemy.orm import Mapped, mapped_column, relationship, DeclarativeBase
-
+import datetime
 
 
 class Base(DeclarativeBase):
@@ -19,6 +19,7 @@ class type_products(Base):
     __tablename__ = 'type_products'
     id: Mapped[int] = mapped_column(primary_key=True)
     name_type_product: Mapped[str]
+    products: Mapped['products'] = relationship(back_populates='type_product')
 
 class s1_products(Base):
     __tablename__ = 's1_products'
@@ -38,3 +39,15 @@ class s3_products(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name_s3: Mapped[str]
     s2_product_id: Mapped[int] = mapped_column(ForeignKey('s2_products.id'))
+
+class products(Base):
+    __tablename__ = 'products'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name_product: Mapped[str]
+    id_product: Mapped[str]
+    img_name: Mapped[str]
+    created: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
+    provider_id: Mapped[int] = mapped_column(ForeignKey('provider.id'))
+    type_product_id: Mapped[int] = mapped_column(ForeignKey('type_products.id'))
+    s1_id: Mapped[int] = mapped_column(ForeignKey('s1_products.id'))
+    type_product: Mapped['type_products'] = relationship(back_populates='products')

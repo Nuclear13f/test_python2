@@ -3,7 +3,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, jsonif
 from flask_login import login_required, current_user, logout_user, login_user
 from model import users
 from flask_bcrypt import Bcrypt
-from coredb import select_type_products
+from coredb import select_type_products, select_products
 import copy
 
 
@@ -115,6 +115,21 @@ def test2():
     print('Я тута')
     print(str)
     return redirect('/?page=')
+
+
+@auth.route('/get_products', methods=['GET', 'POST'])
+@login_required
+def get_products():
+
+    data = request.get_json()
+    print(data)
+    print(data['con'])
+    print(data['flag'])
+    flag = {'s1_id': 5}
+    page = {'limit': 10, 'offset': 0}
+    data = select_products(flag,page);
+    return jsonify("suss")
+
 
 
 @auth.route('/get_stat_product', methods=['GET', 'POST'])

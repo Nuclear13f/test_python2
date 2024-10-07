@@ -129,7 +129,6 @@ async function getCategory() {
 getCategory();
 
 const hClick2 = (event) => {
-    go_stat();
     if (event.target.checked){
         let url = new URL(window.location)
         url.searchParams.append("type",event.target.value)
@@ -152,6 +151,7 @@ const hClick2 = (event) => {
             history.replaceState(history.state, '', url.href);
         }
     }
+    go_products();
 }
 
 
@@ -170,8 +170,6 @@ getProduct();
 
 
 const hClick = (event) => {
-    console.log(event.target.value)
-    console.log(event.type)
 
     if (event.target.checked){
         // const r = new URL(window.location.href)
@@ -221,5 +219,38 @@ async function go_stat(){
     let render = await get_stat();
     console.log(render)
 }
-go_stat();
+// go_stat();
+
+
+async function get_products() {
+
+ const newPost =
+    {
+    "userId": 1,
+    "id": 44343433434,
+    "title": "Hellow",
+    "body": "awdawdfawsregsegsefsefsfsef",
+     "flag": true,
+     "con": ["flag1","flag2"],
+     "sas": {"s": 1, "b": 2}
+
+  }
+
+const test = JSON.stringify(newPost) //Оборочиваем в строку JSON
+    console.log(newPost)
+    console.log(test)
+    const result = await $.ajax({
+        url: '/get_products',
+        method: 'post',
+        contentType: 'application/json',
+        data:  test,
+    });
+    return result;
+}
+
+async function go_products(){
+    let render = await get_products();
+    console.log(render)
+}
+go_products();
 
