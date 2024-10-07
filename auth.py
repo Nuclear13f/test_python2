@@ -123,12 +123,26 @@ def get_products():
 
     data = request.get_json()
     print(data)
-    print(data['con'])
-    print(data['flag'])
-    flag = {'s1_id': 5}
-    page = {'limit': 10, 'offset': 0}
+    if data['type']:
+        flag = data['type']
+    else: flag=[1,2]
+    # for p in data:
+    #     print(p)
+    #     if p['type_product_id']:
+    #         n["type_product_id"] = p['type_product_id']
+    # print('flg', n)
+    # flag = {'s1_id': 5}
+
+    # if data['type_product_id']:
+    #     n = {}
+    #     for p in data['type_product_id']:
+    #         print(p)
+
+    # flag = {'type_product_id': 2, 'type_product_id': 1}
+    # flag = {'type_product_id': [1,2]}
+    page = {'limit': 10, 'offset': None}
     data = select_products(flag,page);
-    return jsonify("suss")
+    return jsonify(len(data))
 
 
 

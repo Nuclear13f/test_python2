@@ -31,29 +31,48 @@ def select_type_products(self):
         dict = {'type': resu, 's1': resu2, 's2': resu3, 's3': resu4}
     return (dict)
 
-
-def select_products(flag,page):
-    print('select product_1')
-    fil = {'s1_id': 5}
-    print(fil)
-    print(*fil)
-    # print(**fil)
+def select_products(flag, page):
+    param_type = []
+    if flag:
+        for w in flag:
+            param_type.append(int(w))
+    else: param_type[1,2]
     with session_factory() as session:
+        # dddd = (products.type_product_id==1)|(products.type_product_id==2)
+        # dddd = (products.type_product_id == v for v in ('1','2'))
+        # filter(or_(User.name == v for v in ('Alice', 'Bob', 'Carl')))
+
+        # q({'id': 5}, 2, 50)
+        # def q(filters, page=0, page_size=None):
+        #     query = session.query(...).filter_by(**filters)
+        #     if page_size:
+        #         query = query.limit(page_size)
+        #     if page:
+        #         query = query.offset(page * page_size)
+        #     return query
+
         query = (
             select(products
                    )
-            .filter_by(**flag)
-            .limit(page['limit'])
-            .offset(page['offset'])
+            .filter(products.type_product_id.in_(param_type))
+            # .filter((AddressBook.lastname == 'bulger') | (AddressBook.firstname == 'whitey'))
+        #     not_null_filters =[]
+        #     if filter.title:
+        #     not_null_filters.append(Book.title.ilike(filter.title))
+        # if filter.author:
+        # #     not_null_filters.append(Book.author.ilike(filter.author))
+        #
+        # if len(not_null_filters) > 0:
+        #     query = query.filter(or_(*not_null_filters))
+
+            # .limit(page['limit'])
+            # .offset(page['offset'])
         )
-
-
         res = session.execute(query).scalars().all()
-        print('select product_2')
-        print(res)
-        for p in res:
-            # print(p.name_product, "  ", p.type_product.name_type_product)
-            print(p.name_product)
         print(len(res))
+        query = query.limit(10)
+        res = session.execute(query).scalars().all()
+        print(len(res))
+
 
     return(res)

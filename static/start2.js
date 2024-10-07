@@ -1,5 +1,5 @@
 const site2 = document.querySelector("#site2")
-
+const param = [{'type': 'type_product_id'}, {'s1': 's1'}]
 
 html = '<div class="start2"></div>  <button type="button" class="btn btn-success r2">Заказы</button>'
 site2.insertAdjacentHTML('beforeend', html)
@@ -110,14 +110,14 @@ async function getCategory() {
 
     if (d1){
         d1.forEach(s =>{
-            if (s==="material"){checked_m='checked'}
-            if (s==="instrument"){checked_i='checked'}
+            if (s==="2"){checked_m='checked'}
+            if (s==="1"){checked_i='checked'}
         })
     }
 
-    html = '<div><input id="checkbox-1" type="checkbox" class="pt-checker_L" name="novelty" labelhtml="[object Object]" value="material"' + checked_m + '><label for="checkbox-1" class="pt-checkbox-label_L" ><div class="filter-titte-qty ">Материал</div></label>\</div>'
+    html = '<div><input id="checkbox-1" type="checkbox" class="pt-checker_L" name="novelty" labelhtml="[object Object]" value="2"' + checked_m + '><label for="checkbox-1" class="pt-checkbox-label_L" ><div class="filter-titte-qty ">Материал</div></label>\</div>'
     stouts.insertAdjacentHTML('beforeend', html)
-    html = '<div><input id="checkbox-2" type="checkbox" class="pt-checker_L" name="novelty" labelhtml="[object Object]" value="instrument"' + checked_i + '><label for="checkbox-2" class="pt-checkbox-label_L" ><div class="filter-titte-qty ">Инструмент</div></label>\</div>'
+    html = '<div><input id="checkbox-2" type="checkbox" class="pt-checker_L" name="novelty" labelhtml="[object Object]" value="1"' + checked_i + '><label for="checkbox-2" class="pt-checkbox-label_L" ><div class="filter-titte-qty ">Инструмент</div></label>\</div>'
     stouts.insertAdjacentHTML('beforeend', html)
     const check2 = await document.querySelectorAll(".pt-checker_L")
     check2.forEach(check => {
@@ -232,13 +232,26 @@ async function get_products() {
     "body": "awdawdfawsregsegsefsefsfsef",
      "flag": true,
      "con": ["flag1","flag2"],
-     "sas": {"s": 1, "b": 2}
+     "type": []
 
   }
+let par = []
+let url = new URL(window.location)
+       if (url.searchParams.toString()) {console.log('есть праметры')
+          if (url.searchParams.has('type')) {
+              console.log('Yea', url.searchParams.getAll('type'))
+              url.searchParams.getAll('type').forEach(p=>{
+                  let s = {'type_product_id': p}
+                  par.push(s)
+              })
+              newPost['type'] = url.searchParams.getAll('type')
+              console.log(newPost)
+          }
+
+       } else {console.log('нет параметров')}
+
 
 const test = JSON.stringify(newPost) //Оборочиваем в строку JSON
-    console.log(newPost)
-    console.log(test)
     const result = await $.ajax({
         url: '/get_products',
         method: 'post',
