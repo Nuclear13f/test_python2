@@ -3,8 +3,9 @@ from flask import Blueprint, render_template, request, redirect, url_for, jsonif
 from flask_login import login_required, current_user, logout_user, login_user
 from model import users
 from flask_bcrypt import Bcrypt
-from coredb import select_type_products, select_products
+from coredb import select_type_products, select_products, get_data_provider
 import copy
+import json
 
 
 auth = Blueprint('auth', __name__)
@@ -42,7 +43,10 @@ def start():
 def events():
     return render_template('events.html/', client="dddd")
 
-
+@auth.route('/admin/')
+@login_required
+def admin():
+    return render_template('clear_element.html', client="dddd")
 
 
 
@@ -100,6 +104,10 @@ def test():
     return render_template('test_1.html/', client="dddd")
 
 
+
+
+
+
 @auth.route('/cabinet/order/', methods=['GET', 'POST'])
 # @auth.route('/cabinet/<username>')
 def order():
@@ -140,10 +148,19 @@ def get_products():
 
     # flag = {'type_product_id': 2, 'type_product_id': 1}
     # flag = {'type_product_id': [1,2]}
-    page = {'limit': 10, 'offset': None}
-    data = select_products(flag,page);
-    return jsonify(len(data))
+    page = {'limit': 20, 'offset': 100}
+    data = select_products(flag, page);
 
+    return jsonify(data)
+
+
+
+
+@auth.route('/get_provider', methods=['GET', 'POST'])
+def get_provider():
+    print('Шаг 1')
+    prov = get_data_provider(id)
+    return jsonify(prov)
 
 
 @auth.route('/get_stat_product', methods=['GET', 'POST'])

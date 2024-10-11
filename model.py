@@ -51,3 +51,17 @@ class products(Base):
     type_product_id: Mapped[int] = mapped_column(ForeignKey('type_products.id'))
     s1_id: Mapped[int] = mapped_column(ForeignKey('s1_products.id'))
     type_product: Mapped['type_products'] = relationship(back_populates='products')
+
+class provider(Base):
+    __tablename__ = "provider"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    provider: Mapped[str]
+    little_provider: Mapped[str]
+    adress: Mapped[str]
+    scope: Mapped[str]
+    inn: Mapped[str]
+    contact: Mapped[str]
+    manadger: Mapped[str]
+    note: Mapped[str]
+    stip_pay_agr: Mapped[str]
+    # order_delay: Mapped['delay_order'] = relationship(back_populates='provider')

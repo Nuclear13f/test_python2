@@ -1,6 +1,6 @@
 from config import session_factory, sync_engine
 from sqlalchemy import Integer, and_, func, insert, select, text, update, func, cast, delete
-from model import type_products, s1_products, s2_products, s3_products, products
+from model import type_products, s1_products, s2_products, s3_products, products, provider
 
 
 def select_type_products(self):
@@ -69,10 +69,25 @@ def select_products(flag, page):
             # .offset(page['offset'])
         )
         res = session.execute(query).scalars().all()
-        print(len(res))
-        query = query.limit(10)
+        count = len(res)
+        query = query.limit(page['limit'])
+        query = query.offset(page['offset'])
         res = session.execute(query).scalars().all()
-        print(len(res))
+        dict_data = []
+        for w in res:
+            dict_data.append({'id': w.id, 'name_product': w.name_product, 'id_product': w.id_product})
+        dict = {'count': count, 'data': dict_data}
+    return(dict)
 
-
-    return(res)
+def get_data_provider(self):
+    print('get_provider 1')
+    dict_data = [];
+    with session_factory() as session:
+        query = (
+            select(provider)
+        )
+        res = session.execute(query).scalars().all()
+        for w in res:
+            dict_data.append({'id': w.id, 'name_provider': w.provider})
+        dict = {'name': 'provider', 'data': dict_data}
+        return (dict)

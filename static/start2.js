@@ -1,34 +1,7 @@
 const site2 = document.querySelector("#site2")
 const param = [{'type': 'type_product_id'}, {'s1': 's1'}]
 
-html = '<div class="start2"></div>  <button type="button" class="btn btn-success r2">Заказы</button>'
-site2.insertAdjacentHTML('beforeend', html)
 
-
-$(document).on("click", '.r2', function () {
-    alert('Привет')
-    // let http = new XMLHttpRequest()
-    // let data = []
-    // http.open('POST', '/start/?page=2')
-    // http.send(data)
-});
-
-function start(){
-    let http = new XMLHttpRequest()
-    let data = []
-    alert('s1')
-    http.open('POST', '/start/?page=1')
-    http.send(data)
-
-}
-// start();
-
-$(document).on("click", '.ssaass', function () {
-
-    // alert(event.target.text)
-    const params = '?page=' + event.target.text
-    window.history.pushState('1', 'Title', params);
-});
 
 async function getData() {
    const data = await fetch('https://jsonplaceholder.typicode.com/todos')
@@ -39,9 +12,6 @@ async function getData() {
 async function gData(){
     let render = await getData();
     render.forEach(rer =>{
-        // console.log(rer)
-        // console.log(rer.title)
-
     })
 }
 // gData();
@@ -67,7 +37,7 @@ async function gData(){
 //     )
 // })
 
-function render1() {
+function render() {
     let divE = document.createElement('div')
     divE.classList.add('container')
     divE.style.border = '1px solid #0000FF';
@@ -76,45 +46,21 @@ function render1() {
         'width: 20%; margin-right: 10px"></div> <div class="container start2" style="height: 50px; width: 80%"></div> </div>'
     divE.insertAdjacentHTML('beforeend', http_c)
     site2.prepend(divE)
-    console.log(1, 'render')
 }
-render1();
-
+render();
 
 async function getCategory() {
-    console.log(2, 'getCategories')
-    const data = await fetch('https://fakestoreapi.com/products/categories')
-    const info = await data.json() //Достаем данные
     const url = new URL(window.location)
     const stouts = document.querySelector("#stouts")
-    let checked = "";
-
-    info.forEach(rer => {
-        if (url.searchParams.get(rer)) {
-            checked = 'checked'
-        } else {
-            checked = ''
-        }
-        html = '<div class="form-check"> <input class="form-check-input" type="checkbox" value="' + rer + '" id="flexCheckDefault"' + checked + '>' +
-            '<label class="form-check-label" for="flexCheckDefault">' + rer + '  </label></div>'
-        stouts.insertAdjacentHTML('beforeend', html)
-    })
-    const check = await document.querySelectorAll(".form-check")
-    check.forEach(check => {
-            check.addEventListener('click', hClick)
-        }
-    )
     let d1 = url.searchParams.getAll('type')
     let checked_m = "";
     let checked_i = "";
-
     if (d1){
         d1.forEach(s =>{
             if (s==="2"){checked_m='checked'}
             if (s==="1"){checked_i='checked'}
         })
     }
-
     html = '<div><input id="checkbox-1" type="checkbox" class="pt-checker_L" name="novelty" labelhtml="[object Object]" value="2"' + checked_m + '><label for="checkbox-1" class="pt-checkbox-label_L" ><div class="filter-titte-qty ">Материал</div></label>\</div>'
     stouts.insertAdjacentHTML('beforeend', html)
     html = '<div><input id="checkbox-2" type="checkbox" class="pt-checker_L" name="novelty" labelhtml="[object Object]" value="1"' + checked_i + '><label for="checkbox-2" class="pt-checkbox-label_L" ><div class="filter-titte-qty ">Инструмент</div></label>\</div>'
@@ -124,9 +70,21 @@ async function getCategory() {
             check.addEventListener('click', hClick2)
         }
     )
-
 }
 getCategory();
+
+async function getProviders() {
+    const stouts = document.querySelector("#stouts")
+    // mySelectRender(stouts)
+    let eSelect_1 = document.createElement('select')
+    eSelect_1.value = 'multiple'
+    eSelect_1.setAttribute('id', 'multiple')
+    console.log(eSelect_1)
+}
+
+getProviders();
+
+
 
 const hClick2 = (event) => {
     if (event.target.checked){
@@ -155,11 +113,6 @@ const hClick2 = (event) => {
 }
 
 
-
-
-
-
-
 async function getProduct() {
     const data = await fetch('https://fakestoreapi.com/products')
     const info = await data.json()
@@ -168,41 +121,18 @@ async function getProduct() {
 }
 getProduct();
 
-
-const hClick = (event) => {
-
-    if (event.target.checked){
-        // const r = new URL(window.location.href)
-        // let ss = r.searchParams.values();
-        // console.log(r)
-        // console.log(ss)
-        // const params = '?' + event.target.value + '=1'
-        let url = new URL(window.location)
-        url.searchParams.append(event.target.value,'1')
-        window.history.replaceState(window.history.state,'',url.href)
-
-    } else {
-        // window.history.pushState('2', '', '');
-        const url = new URL(window.location.href)
-        url.searchParams.delete(event.target.value)
-        console.log(url.href)
-        history.replaceState(history.state, '', url.href);
-    }
-}
-
 async function get_stat() {
 
- const newPost =
-    {
-    "userId": 1,
-    "id": 44343433434,
-    "title": "Hellow",
-    "body": "awdawdfawsregsegsefsefsfsef",
-     "flag": true,
-     "con": ["flag1","flag2"],
-     "sas": {"s": 1, "b": 2}
-
-  }
+    const newPost =
+        {
+            "userId": 1,
+            "id": 44343433434,
+            "title": "Hellow",
+            "body": "awdawdfawsregsegsefsefsfsef",
+            "flag": true,
+            "con": ["flag1", "flag2"],
+            "sas": {"s": 1, "b": 2}
+        }
 
 const test = JSON.stringify(newPost) //Оборочиваем в строку JSON
 
@@ -263,7 +193,48 @@ const test = JSON.stringify(newPost) //Оборочиваем в строку JS
 
 async function go_products(){
     let render = await get_products();
-    console.log(render)
 }
 go_products();
 
+async function get_provider() {
+    const result = await $.ajax({
+        url: '/get_provider',
+        method: 'get',
+        contentType: 'application/json',
+    });
+    return result;
+}
+async function go_provider(){
+    let render = await get_provider();
+    console.log(render)
+}
+go_provider();
+
+
+
+function mySelectRender (r) {
+    stouts.insertAdjacentHTML('beforeend', html)
+    let eDiv_1 = document.createElement('div')
+    eDiv_1.classList.add('select-box')
+    let eDiv_2 = document.createElement('div')
+    eDiv_2.classList.add('select-option')
+    eDiv_2.insertAdjacentHTML('beforeend', '<input type="text" placeholder="Выбрать" id="soValue_3" readonly name="">')
+    eDiv_1.append(eDiv_2)
+    let eDiv_3 = document.createElement('div')
+    let eDiv_4 = document.createElement('div')
+    eDiv_3.classList.add('content')
+    //
+    eDiv_4.classList.add('search')
+    eDiv_4.insertAdjacentHTML('beforeend', '<input type="text" id="optionSearch_3" placeholder="Поиск" name="">')
+    eDiv_3.append(eDiv_4)
+    eDiv_1.append(eDiv_3)
+    let eUl = document.createElement('ul')
+    eUl.classList.add('options')
+    let eLi = document.createElement('li')
+    eLi.setAttribute('value', 1)
+    eLi.textContent = 'sadasdasdassad'
+    eUl.append(eLi)
+
+    eDiv_3.append(eUl)
+    stouts.append(eDiv_1)
+}
