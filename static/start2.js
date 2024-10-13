@@ -77,9 +77,23 @@ async function getProviders() {
     const stouts = document.querySelector("#stouts")
     // mySelectRender(stouts)
     let eSelect_1 = document.createElement('select')
-    eSelect_1.value = 'multiple'
-    eSelect_1.setAttribute('id', 'multiple')
+    eSelect_1.setAttribute('id', 'select_providers')
+    eSelect_1.multiple = true
     console.log(eSelect_1)
+    html = '<option value="value 1">sdfdfds</option>'
+    let render = go_provider();
+    console.log(render)
+    let s = render.then(r =>{
+        console.log(s)
+    })
+    // render['data'].forEach(rer =>{
+    //     console.log(rer['name_provider'])
+    // })
+
+
+
+    eSelect_1.insertAdjacentHTML('beforeend', html)
+    stouts.append(eSelect_1)
 }
 
 getProviders();
@@ -199,16 +213,16 @@ go_products();
 async function get_provider() {
     const result = await $.ajax({
         url: '/get_provider',
-        method: 'get',
+        method: 'post',
         contentType: 'application/json',
     });
     return result;
 }
 async function go_provider(){
-    let render = await get_provider();
-    console.log(render)
+    const render = await get_provider();
+    return render
 }
-go_provider();
+
 
 
 

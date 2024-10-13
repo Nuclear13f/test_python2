@@ -48,7 +48,8 @@ optionSearch.addEventListener('keyup', function () {
 })
 
 new SlimSelect({
-  select: '#multiple',
+  // select: '#multiple',
+     select: '#select_providers',
 settings: {
     placeholderText: 'Выбери поставщика'}
 
