@@ -128,27 +128,15 @@ def test2():
 @auth.route('/get_products', methods=['GET', 'POST'])
 @login_required
 def get_products():
-
+    provider = []
+    flag = {'type': [], 'provider': []}
     data = request.get_json()
     print(data)
     if data['type']:
-        flag = data['type']
-    else: flag=[1,2]
-    # for p in data:
-    #     print(p)
-    #     if p['type_product_id']:
-    #         n["type_product_id"] = p['type_product_id']
-    # print('flg', n)
-    # flag = {'s1_id': 5}
-
-    # if data['type_product_id']:
-    #     n = {}
-    #     for p in data['type_product_id']:
-    #         print(p)
-
-    # flag = {'type_product_id': 2, 'type_product_id': 1}
-    # flag = {'type_product_id': [1,2]}
-    page = {'limit': 20, 'offset': 100}
+        flag['type'] = data['type']
+    if data['provider']:
+        flag['provider'] = data['provider']
+    page = {'limit': 20, 'offset': 0}
     data = select_products(flag, page);
 
     return jsonify(data)

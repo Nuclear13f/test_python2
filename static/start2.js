@@ -3,6 +3,7 @@ const param = [{'type': 'type_product_id'}, {'s1': 's1'}]
 
 
 
+
 async function getData() {
    const data = await fetch('https://jsonplaceholder.typicode.com/todos')
     const data2 = await data.json() //Достаем данные
@@ -42,8 +43,8 @@ function render() {
     divE.classList.add('container')
     divE.style.border = '1px solid #0000FF';
     divE.style.height = '200px'
-    const http_c = '<div class="container myFlex" style="margin-top: 10px"> <div id="stouts" class="container start2" style="; ' +
-        'width: 20%; margin-right: 10px"></div> <div class="container start2" style="height: 50px; width: 80%"></div> </div>'
+    const http_c = '<div class="container myFlex" style="margin-top: 0px"> <div id="stouts" class="start2" style="; ' +
+        'width: 20%; margin-right: 10px"></div> <div class="start2" style="height: 50px; width: 80%"></div> </div>'
     divE.insertAdjacentHTML('beforeend', http_c)
     site2.prepend(divE)
 }
@@ -73,30 +74,58 @@ async function getCategory() {
 }
 getCategory();
 
-async function getProviders() {
-    const stouts = document.querySelector("#stouts")
-    // mySelectRender(stouts)
-    let eSelect_1 = document.createElement('select')
-    eSelect_1.setAttribute('id', 'select_providers')
-    eSelect_1.multiple = true
-    console.log(eSelect_1)
-    html = '<option value="value 1">sdfdfds</option>'
-    let render = go_provider();
-    console.log(render)
-    let s = render.then(r =>{
-        console.log(s)
+function ddd() {
+    let sel1 = new SlimSelect({
+        select: '#select_providers',
+        settings: {
+            placeholderText: 'Выбери поставщика'
+        },
+        events: {
+            afterChange: (newVal) => {
+                hClick4444(newVal)
+            }
+        }
     })
-    // render['data'].forEach(rer =>{
-    //     console.log(rer['name_provider'])
-    // })
-
-
-
-    eSelect_1.insertAdjacentHTML('beforeend', html)
-    stouts.append(eSelect_1)
+    const url = new URL(window.location)
+    let d1 = url.searchParams.getAll('provider')
+    if (d1){
+        m = []
+        d1.forEach(s =>{
+            m.push(s)
+        })
+        sel1.setSelected(m)
+    }
 }
 
+async function getProviders() {
+    const stouts = document.querySelector("#stouts")
+    let eSelect_1 = document.createElement('select')
+    eSelect_1.classList.add('provider22112')
+    eSelect_1.setAttribute('id', 'select_providers')
+    eSelect_1.multiple = true
+    let html2 = '<option value="value 1">sdfdfds</option>'
+    let html = ''
+    let render = await go_provider();
+    render['data'].forEach(d => {
+        let eOption = document.createElement('option')
+            eOption.textContent = d['name_provider']
+            eOption.setAttribute('id', d['id'])
+            eOption.setAttribute('value',d['id'])
+            eSelect_1.append(eOption)
+    })
+    stouts.append(eSelect_1)
+    ddd();
+}
 getProviders();
+
+
+
+
+
+
+
+
+
 
 
 
@@ -115,6 +144,7 @@ const hClick2 = (event) => {
             let str = param.getAll('type')
             for (let i=0; i<str.length;++i) {
                 if (event.target.value===str[i]) {
+                    // Удалим из массива один элемент начиная с i
                     str.splice(i,1)
                 }
             }
@@ -168,45 +198,49 @@ async function go_stat(){
 
 async function get_products() {
 
- const newPost =
-    {
-    "userId": 1,
-    "id": 44343433434,
-    "title": "Hellow",
-    "body": "awdawdfawsregsegsefsefsfsef",
-     "flag": true,
-     "con": ["flag1","flag2"],
-     "type": []
+    const newPost =
+        {
+            "userId": 1,
+            "id": 44343433434,
+            "title": "Hellow",
+            "body": "awdawdfawsregsegsefsefsfsef",
+            "flag": true,
+            "con": ["flag1", "flag2"],
+            "type": [],
+            'provider': []
+        }
+    let type_m = []
+    let url = new URL(window.location)
+    if (url.searchParams.toString()) {
+        console.log('есть параметры')
+        if (url.searchParams.has('type')) {
+            // url.searchParams.getAll('type').forEach(p=>{
+            //     let s = {'type_product_id': p}
+            //     type_m.push(s)
+            // })
+            newPost['type'] = url.searchParams.getAll('type')
+        }
+        if (url.searchParams.has('provider')) {
+            newPost['provider'] = url.searchParams.getAll('provider')
+        }
+    } else {
+        console.log('нет параметров')
+    }
 
-  }
-let par = []
-let url = new URL(window.location)
-       if (url.searchParams.toString()) {console.log('есть праметры')
-          if (url.searchParams.has('type')) {
-              console.log('Yea', url.searchParams.getAll('type'))
-              url.searchParams.getAll('type').forEach(p=>{
-                  let s = {'type_product_id': p}
-                  par.push(s)
-              })
-              newPost['type'] = url.searchParams.getAll('type')
-              console.log(newPost)
-          }
 
-       } else {console.log('нет параметров')}
-
-
-const test = JSON.stringify(newPost) //Оборочиваем в строку JSON
+    const test = JSON.stringify(newPost) //Оборочиваем в строку JSON
     const result = await $.ajax({
         url: '/get_products',
         method: 'post',
         contentType: 'application/json',
-        data:  test,
+        data: test,
     });
     return result;
 }
 
 async function go_products(){
     let render = await get_products();
+    console.log(render)
 }
 go_products();
 
@@ -252,3 +286,33 @@ function mySelectRender (r) {
     eDiv_3.append(eUl)
     stouts.append(eDiv_1)
 }
+
+
+// Обработчик select provider
+
+let select1 = new SlimSelect({
+    select: '#multiple'
+})
+select1.setSelected('value 7')
+
+
+const hClick4444 = (event) => {
+    let elem = document.querySelector('.ss-values')
+    const url = new URL(window.location.href)
+    const param = url.searchParams
+    param.delete('provider');
+
+    elem.childNodes.forEach(f =>{
+        if (!!f) {
+            let dataid = f.getAttribute('data-id')
+                console.log(dataid)
+                if (dataid != null){
+                param.append('provider', dataid)
+                history.replaceState(history.state, '', url.href);
+        }else {history.replaceState(history.state, '', url.href)}
+        }
+    })
+    go_products();
+}
+
+

@@ -68,7 +68,6 @@
 .options li:hover{
     background-color: #f2f2f2
 }
-
 .select-box.active .content {
     display: block;
 }

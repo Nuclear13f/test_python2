@@ -1,5 +1,5 @@
 from config import session_factory, sync_engine
-from sqlalchemy import Integer, and_, func, insert, select, text, update, func, cast, delete
+from sqlalchemy import Integer, and_, func, insert, select, text, update, func, cast, delete, or_
 from model import type_products, s1_products, s2_products, s3_products, products, provider
 
 
@@ -33,10 +33,27 @@ def select_type_products(self):
 
 def select_products(flag, page):
     param_type = []
-    if flag:
-        for w in flag:
+    param_provider = []
+    if flag['type']:
+        for w in flag['type']:
             param_type.append(int(w))
-    else: param_type[1,2]
+    if flag['provider']:
+        for w in flag['provider']:
+            param_provider.append(int(w))
+
+    print('param', param_provider)
+    # if flag:
+    #     for w in flag:
+    #         if w['type']:
+
+            # if w['type']:
+            #     for s in w['type']:
+            #         param_type.append(int(s))
+            # if w['provider']:
+            #     for s in w['provider']:
+            #         param_provider.append(int(s))
+
+
     with session_factory() as session:
         # dddd = (products.type_product_id==1)|(products.type_product_id==2)
         # dddd = (products.type_product_id == v for v in ('1','2'))
@@ -51,23 +68,14 @@ def select_products(flag, page):
         #         query = query.offset(page * page_size)
         #     return query
 
-        query = (
-            select(products
-                   )
-            .filter(products.type_product_id.in_(param_type))
-            # .filter((AddressBook.lastname == 'bulger') | (AddressBook.firstname == 'whitey'))
-        #     not_null_filters =[]
-        #     if filter.title:
-        #     not_null_filters.append(Book.title.ilike(filter.title))
-        # if filter.author:
-        # #     not_null_filters.append(Book.author.ilike(filter.author))
-        #
-        # if len(not_null_filters) > 0:
-        #     query = query.filter(or_(*not_null_filters))
-
-            # .limit(page['limit'])
-            # .offset(page['offset'])
-        )
+        query_filter = []
+        if param_type:
+            query_filter.append(products.type_product_id.in_(param_type))
+        if param_provider:
+            query_filter.append(products.provider_id.in_(param_provider))
+        # query_filter.append(products.img_name.is_(None))
+        # query_filter.append(products.img_name.is_not(None))
+        query = (select(products).filter(*query_filter))
         res = session.execute(query).scalars().all()
         count = len(res)
         query = query.limit(page['limit'])

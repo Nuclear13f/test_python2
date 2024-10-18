@@ -16,6 +16,7 @@
     cursor: pointer;
     display: inline-block;
     font-family: PT-Roboto;
+    /*font-family: sans-serif;*/
     font-size: 14px;
     font-style: normal;
     font-weight: 400;
@@ -85,3 +86,51 @@
     line-height: 18px
 }
 
+@font-face {
+    font-display: auto;
+    font-display: block;
+    font-family: pt-icon-font;
+    font-style: normal;
+    font-weight: 400;
+    src: url(https://s2.p-static.ru/fonts/pt-icon/1.16/pt-icon-font.woff2) format("woff2")
+}
+
+@font-face {
+    font-display: swap;
+    font-family: PT-Roboto;
+    font-style: normal;
+    font-weight: 300;
+    src: url(https://s2.p-static.ru/fonts/roboto-light.woff2) format("woff2")
+}
+
+@font-face {
+    font-display: swap;
+    font-family: PT-Roboto;
+    font-style: normal;
+    font-weight: 400;
+    src: url(https://s2.p-static.ru/fonts/roboto-regular.woff2) format("woff2")
+}
+
+@font-face {
+    font-display: swap;
+    font-family: PT-Roboto;
+    font-style: normal;
+    font-weight: 500;
+    src: url(https://s2.p-static.ru/fonts/roboto-medium.woff2) format("woff2")
+}
+
+@font-face {
+    font-display: swap;
+    font-family: PT-Roboto;
+    font-style: normal;
+    font-weight: 700;
+    src: url(https://s2.p-static.ru/fonts/roboto-bold.woff2) format("woff2")
+}
+
+@font-face {
+    font-display: swap;
+    font-family: PT-Roboto;
+    font-style: normal;
+    font-weight: 900;
+    src: url(https://s2.p-static.ru/fonts/roboto-black.woff2) format("woff2")
+}
