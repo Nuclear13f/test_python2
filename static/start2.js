@@ -18,33 +18,13 @@ async function gData(){
 // gData();
 
 
-// const url ='https://fakestoreapi.com/products/categories'
-// let check = document.querySelectorAll(".form-check")
-//
-// console.log(url)
-// fetch(url, {
-//     method: 'GET',
-// }).then((data) => {
-//     return data.json()
-// }).then((info) => {
-//     console.log(info)
-//     info.forEach(rer => {
-//             console.log(rer)
-//         html = '<div class="form-check"> <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">' +
-//             '<label class="form-check-label" for="flexCheckDefault">' + rer + '  </label></div>'
-//         site2.insertAdjacentHTML('beforeend', html)
-//         }
-//
-//     )
-// })
 
 function render() {
     let divE = document.createElement('div')
     divE.classList.add('container')
     divE.style.border = '1px solid #0000FF';
-    divE.style.height = '200px'
-    const http_c = '<div class="container myFlex" style="margin-top: 0px"> <div id="stouts" class="start2" style="; ' +
-        'width: 20%; margin-right: 10px"></div> <div class="start2" style="height: 50px; width: 80%"></div> </div>'
+    // divE.style.height = '200px'
+    const http_c = '<div class="container myFlex" style="margin-top: 0px"> <div id="stouts" class="start2"></div> <div class="start2_"></div> </div>'
     divE.insertAdjacentHTML('beforeend', http_c)
     site2.prepend(divE)
 }
@@ -93,8 +73,9 @@ function ddd() {
         d1.forEach(s =>{
             m.push(s)
         })
-        sel1.setSelected(m)
+        sel1.setSelected(m, false)
     }
+
 }
 
 async function getProviders() {
@@ -117,16 +98,6 @@ async function getProviders() {
     ddd();
 }
 getProviders();
-
-
-
-
-
-
-
-
-
-
 
 
 const hClick2 = (event) => {
@@ -157,16 +128,15 @@ const hClick2 = (event) => {
 }
 
 
-async function getProduct() {
-    const data = await fetch('https://fakestoreapi.com/products')
-    const info = await data.json()
-    info.forEach(rer => {
-    })
-}
-getProduct();
+// async function getProduct() {
+//     const data = await fetch('https://fakestoreapi.com/products')
+//     const info = await data.json()
+//     info.forEach(rer => {
+//     })
+// }
+// getProduct();
 
 async function get_stat() {
-
     const newPost =
         {
             "userId": 1,
@@ -240,7 +210,31 @@ async function get_products() {
 
 async function go_products(){
     let render = await get_products();
-    console.log(render)
+    html2 = ''
+    render['data'].forEach(f1 => {
+        html2 = html2 + '<div>' + f1['name_product'] + '</div>'
+    })
+
+    let start2 = document.querySelector(".start2_")
+    let elem2 = document.querySelector(".start3_")
+    let divP = document.createElement('div')
+    divP.classList.add('pagination13')
+
+    if (elem2) {elem2.remove()} else {console.log('нет элемента')}
+
+    let div = document.createElement('div')
+    div.classList.add('start3_')
+    start2.prepend(div)
+    start2.append(divP)
+    console.log(start2.children)
+    const array = Array.from(start2.children);
+    console.log(array[0])
+    array[0].insertAdjacentHTML('beforeend', html2)
+    const pagenationsSection = document.querySelector('.pagination13')
+    displayPaginations(pagenationsSection, 3)
+
+
+
 }
 go_products();
 
@@ -256,9 +250,6 @@ async function go_provider(){
     const render = await get_provider();
     return render
 }
-
-
-
 
 function mySelectRender (r) {
     stouts.insertAdjacentHTML('beforeend', html)
@@ -287,13 +278,12 @@ function mySelectRender (r) {
     stouts.append(eDiv_1)
 }
 
-
 // Обработчик select provider
 
-let select1 = new SlimSelect({
-    select: '#multiple'
-})
-select1.setSelected('value 7')
+// let select1 = new SlimSelect({
+//     select: '#multiple'
+// })
+// select1.setSelected('value 7')
 
 
 const hClick4444 = (event) => {
@@ -301,18 +291,60 @@ const hClick4444 = (event) => {
     const url = new URL(window.location.href)
     const param = url.searchParams
     param.delete('provider');
-
-    elem.childNodes.forEach(f =>{
+    console.log('событие', event)
+    elem.childNodes.forEach(f => {
         if (!!f) {
             let dataid = f.getAttribute('data-id')
-                console.log(dataid)
-                if (dataid != null){
+            if (dataid != null) {
                 param.append('provider', dataid)
                 history.replaceState(history.state, '', url.href);
-        }else {history.replaceState(history.state, '', url.href)}
+            } else {
+                history.replaceState(history.state, '', url.href)
+
+            }
+            go_products();
         }
     })
-    go_products();
 }
+
+
+
+function displayPaginations(arrData, c_rows) {
+    // pagesCount = Math.ceil(arrData.length / c_rows);  // Количество кнопочек
+    pagesCount = 10
+    let elem_1_page = document.createElement('div')
+    let elem_2 = document.createElement('div')
+    elem_1_page.className = "pagination"
+    // let str1 = '<button class="page_btn_1">prev</button> <button class="page_btn_2">prev</button> <ul>'
+    // let str1 = '<i class ="fa-solid fa-arrow-right page_btn_1" style="color:#ff4568; transform: rotate(180deg)"></i> <ul>'
+    let str1 = '<ul>'
+    let str4 =  '<i class ="fa-solid fa-arrow-right page_btn_1" style="color:#ff4568"></i> <ul>'
+    let i = 0; let str2 = "", str3 = ""; let tmpstr = "";
+
+    while (i < pagesCount) {
+        i++;
+        if (i === 1) {
+            tmpstr = 'link active'
+        } else {
+            tmpstr = 'link'
+        }
+        if (i > 5 && i < pagesCount) {
+            str3 = "...";
+            flgArrow_1 = true;
+        }
+        else if (i === pagesCount) {
+            str3 = str3 + '<li class="' + tmpstr + '" value="' + i + '" onClick="activelink13()">' + i + '</li>';
+        }
+        else
+        {str2 = str2 + '<li class="' + tmpstr + '" value="' + i + '" onClick="activelink13()">' + i + '</li>'}
+    }
+    elem_1_page.innerHTML = str1 + str2 + str3 + '</ul>'
+
+    arrData.prepend(elem_1_page)
+    arrData.append(elem_2)
+}
+
+
+
 
 

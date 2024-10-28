@@ -48,7 +48,10 @@ def events():
 def admin():
     return render_template('clear_element.html', client="dddd")
 
-
+@auth.route('/grid/')
+@login_required
+def grid():
+    return render_template('table.html', client="dddd")
 
 
 
@@ -136,7 +139,7 @@ def get_products():
         flag['type'] = data['type']
     if data['provider']:
         flag['provider'] = data['provider']
-    page = {'limit': 20, 'offset': 0}
+    page = {'limit': 10, 'offset': 0}
     data = select_products(flag, page);
 
     return jsonify(data)
