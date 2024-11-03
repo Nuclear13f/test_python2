@@ -27,16 +27,7 @@ def home():
 @login_required #входят только зарегистрированные пользователи
 def start():
 
-    return render_template("start.html", test=test)
-    # page = request.args.get('page', 1, type=int)
-    # print(str)
-    # if str:
-    #     return {"page": "fff"}
-    # print(request.args.get('page'))
-    # if int(request.args.get('page')) > 1:
-    #     return "ddddd"
-    # else:
-    #     return render_template("start.html", test = test)
+    return render_template("start.html", test='test')
 
 @auth.route('/events/')
 @login_required
@@ -46,7 +37,13 @@ def events():
 @auth.route('/admin/')
 @login_required
 def admin():
-    return render_template('clear_element.html', client="dddd")
+    return render_template('admin.html', client="dddd")
+
+@auth.route('/admin/product/')
+@login_required
+def admin_product():
+    return render_template('input_product.html', client="dddd")
+
 
 @auth.route('/grid/')
 @login_required
@@ -101,10 +98,10 @@ def logout():
     print('un reg')
     return redirect(url_for('auth.login'))
 
-@auth.route('/cabinet/')
-# @auth.route('/cabinet/<username>')
-def test():
-    return render_template('test_1.html/', client="dddd")
+# @auth.route('/cabinet/')
+# # @auth.route('/cabinet/<username>')
+# def test():
+#     return render_template('test_1.html/', client="dddd")
 
 
 
@@ -115,7 +112,7 @@ def test():
 # @auth.route('/cabinet/<username>')
 def order():
     print('order')
-    return redirect('/cabinet/order/')
+    return render_template('test_1.html/', client="dddd")
 
 
 
@@ -132,14 +129,16 @@ def test2():
 @login_required
 def get_products():
     provider = []
-    flag = {'type': [], 'provider': []}
+    page = {'limit': 10, 'offset': 0}
+    flag = {'type': [], 'provider': [], 'page': []}
     data = request.get_json()
     print(data)
     if data['type']:
         flag['type'] = data['type']
     if data['provider']:
         flag['provider'] = data['provider']
-    page = {'limit': 10, 'offset': 0}
+    if data['page']:
+        page['offset'] = (int(data['page'][0]) - 1)*10
     data = select_products(flag, page);
 
     return jsonify(data)

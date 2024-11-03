@@ -55,35 +55,31 @@ def select_products(flag, page):
 
 
     with session_factory() as session:
-        # dddd = (products.type_product_id==1)|(products.type_product_id==2)
-        # dddd = (products.type_product_id == v for v in ('1','2'))
-        # filter(or_(User.name == v for v in ('Alice', 'Bob', 'Carl')))
-
-        # q({'id': 5}, 2, 50)
-        # def q(filters, page=0, page_size=None):
-        #     query = session.query(...).filter_by(**filters)
-        #     if page_size:
-        #         query = query.limit(page_size)
-        #     if page:
-        #         query = query.offset(page * page_size)
-        #     return query
-
         query_filter = []
         if param_type:
             query_filter.append(products.type_product_id.in_(param_type))
         if param_provider:
             query_filter.append(products.provider_id.in_(param_provider))
-        # query_filter.append(products.img_name.is_(None))
-        # query_filter.append(products.img_name.is_not(None))
         query = (select(products).filter(*query_filter))
+        # query = (select(func.show_trgm(products.name_product)))
+        # query = select(products.name_product, func.similarity(products.name_product, 'Веник')).where(products.name_product.bool_op('%')('Веник'))
+        # query = select(products.name_product, func.similarity(products.name_product, 'fdsdfdfsd dsdasa awad'))
+        # query = select(products).filter(func.similarity(products.name_product, '') > 0.5)
+        # query = select(products.name_product.match('Веник'))
+
         res = session.execute(query).scalars().all()
+        # for w in res:
+        #     print(w.name_product)
+
         count = len(res)
         query = query.limit(page['limit'])
         query = query.offset(page['offset'])
         res = session.execute(query).scalars().all()
         dict_data = []
         for w in res:
-            dict_data.append({'id': w.id, 'name_product': w.name_product, 'id_product': w.id_product})
+            str1 = str(w.provider_id) + ".png"
+            str2 = str(w.provider.provider).replace("\"",'&#39;').replace("\"",'&#187;')
+            dict_data.append({'id': w.id, 'name_product': w.name_product, 'id_product': w.id_product, 'img_product': w.img_name, 'img_logo': str1, 'provider': str2})
         dict = {'count': count, 'data': dict_data}
     return(dict)
 
@@ -99,3 +95,32 @@ def get_data_provider(self):
             dict_data.append({'id': w.id, 'name_provider': w.provider})
         dict = {'name': 'provider', 'data': dict_data}
         return (dict)
+
+def mod_sql_products(dict1):
+    with session_factory() as session:
+        index = 0
+        query = (
+            select(products)
+        ).filter(products.id_product==str(dict1['id_product']))
+        res = session.execute(query).scalars().all()
+        if res:
+            for w in res:
+                w.s1_id = dict1['c1']
+                w.s2_id = dict1['c2']
+                w.s3_id = dict1['c3']
+                w.type_product_id = dict1['type']
+                w.name_product = dict1['product']
+                w.unit = dict1['unit']
+                w.ratio = float(dict1['ratio'])
+                session.commit()
+        else:
+            print('запись', dict1['id_product'])
+            set_con = products(id_product=dict1['id_product'], name_product=dict1['product'],
+                               s1_id=dict1['c1'], s2_id=dict1['c2'], s3_id=dict1['c3'], s4_id=0,
+                               type_product_id=dict1['type'], provider_id=dict1['provider_id'],
+                               unit=dict1['unit'], ratio=float(dict1['ratio']))
+            session.add_all([set_con])
+            session.flush()
+            session.commit()
+
+

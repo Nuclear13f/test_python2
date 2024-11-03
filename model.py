@@ -46,11 +46,18 @@ class products(Base):
     name_product: Mapped[str]
     id_product: Mapped[str]
     img_name: Mapped[str]
+    unit: Mapped[str]
+    ratio: Mapped[float]
     created: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
     provider_id: Mapped[int] = mapped_column(ForeignKey('provider.id'))
     type_product_id: Mapped[int] = mapped_column(ForeignKey('type_products.id'))
     s1_id: Mapped[int] = mapped_column(ForeignKey('s1_products.id'))
+    s2_id: Mapped[int] = mapped_column(ForeignKey('s2_products.id'))
+    s3_id: Mapped[int] = mapped_column(ForeignKey('s3_products.id'))
+    s4_id: Mapped[int] = mapped_column(ForeignKey('s3_products.id'))
     type_product: Mapped['type_products'] = relationship(back_populates='products')
+    provider: Mapped['provider'] = relationship(back_populates='product')
+
 
 class provider(Base):
     __tablename__ = "provider"
@@ -64,4 +71,5 @@ class provider(Base):
     manadger: Mapped[str]
     note: Mapped[str]
     stip_pay_agr: Mapped[str]
+    product: Mapped['products'] = relationship(back_populates='provider')
     # order_delay: Mapped['delay_order'] = relationship(back_populates='provider')
