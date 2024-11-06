@@ -3,7 +3,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, jsonif
 from flask_login import login_required, current_user, logout_user, login_user
 from model import users
 from flask_bcrypt import Bcrypt
-from coredb import select_type_products, select_products, get_data_provider
+from coredb import select_type_products, select_products, get_data_provider,sel_products_input_check, max_id_prod
 import copy
 import json
 
@@ -130,20 +130,41 @@ def test2():
 def get_products():
     provider = []
     page = {'limit': 10, 'offset': 0}
-    flag = {'type': [], 'provider': [], 'page': []}
+    flag = {'type': [], 'provider': [], 'page': [], 'query': []}
     data = request.get_json()
     print(data)
     if data['type']:
         flag['type'] = data['type']
     if data['provider']:
         flag['provider'] = data['provider']
+    if data['query']:
+        flag['query'] = data['query']
     if data['page']:
         page['offset'] = (int(data['page'][0]) - 1)*10
     data = select_products(flag, page);
-
     return jsonify(data)
 
+@auth.route('/get_prd_f_inp_prd', methods=['GET', 'POST'])
+@login_required
+def get_prd_f_inp_prd():
+    data = request.get_json()
+    id = data[0]['providerId']
+    f = data[0]['data']
+    dict = []
+    for w in f:
+        data = sel_products_input_check(id, w['query']);
+        dict_o = {'count': w['count'], 'data': data};
+        dict.append(dict_o)
+    print(dict)
+    return jsonify(dict)
 
+
+@auth.route('/get_id_max_product', methods=['GET', 'POST'])
+@login_required
+def get_id_max_product():
+    data = request.get_json()
+    data = max_id_prod(data);
+    return jsonify(data)
 
 
 @auth.route('/get_provider', methods=['GET', 'POST'])

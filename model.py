@@ -33,6 +33,7 @@ class s2_products(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name_s2: Mapped[str]
     s1_product_id: Mapped[int] = mapped_column(ForeignKey('s1_products.id'))
+    product: Mapped[list['products']] = relationship(back_populates='s2', lazy="joined")
 
 class s3_products(Base):
     __tablename__ = 's3_products'
@@ -57,6 +58,7 @@ class products(Base):
     s4_id: Mapped[int] = mapped_column(ForeignKey('s3_products.id'))
     type_product: Mapped['type_products'] = relationship(back_populates='products')
     provider: Mapped['provider'] = relationship(back_populates='product')
+    s2: Mapped['s2_products'] = relationship(back_populates='product')
 
 
 class provider(Base):

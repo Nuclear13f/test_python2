@@ -2,6 +2,14 @@ const site2 = document.querySelector("#site2")
 const param = [{'type': 'type_product_id'}, {'s1': 's1'}]
 let flgArrow_1 = false;
 let pagesCount = 0
+const url = new URL(window.location.href)
+const param_query = url.searchParams
+param_query.delete('query');
+history.replaceState(history.state, '', url.href)
+
+
+
+
 
 async function getData() {
    const data = await fetch('https://jsonplaceholder.typicode.com/todos')
@@ -191,6 +199,10 @@ async function get_products() {
         if (url.searchParams.has('page')) {
             newPost['page'] = url.searchParams.getAll('page')
         }
+        if (url.searchParams.has('query')) {
+            newPost['query'] = url.searchParams.getAll('query')
+        }
+
     }
 
     const test = JSON.stringify(newPost) //Оборочиваем в строку JSON
@@ -461,7 +473,6 @@ function in_add_pagination(num_page){
                 str3 = str3 + str_end
             }
         });
-
         pagenationsSection.children[0].remove();
         let elem_1 = document.createElement('ul');
         elem_1.classList.add('RE45V')
@@ -470,29 +481,37 @@ function in_add_pagination(num_page){
     }
 }
 
+// **************** Поиск ****************************
 let availKey = ['HTML', 'CSS', 'Easy Tutorial','CS23S','CSS555','CSS4'];
 const resultBoxB1 = document.querySelector(".result-box_b1")
 const inputBox = document.getElementById('input-box_b2')
-inputBox.onkeyup = function (){
+inputBox.onkeyup = function () {
     const url = new URL(window.location.href)
     const param = url.searchParams
-    param.delete('query');
-    history.replaceState(history.state, '', url.href)
     let result1 = []
     let input1 = inputBox.value;
-    if (input1.length <3) {return}
+    if (input1.length < 3) {
+        if (url.searchParams.has('query')) {
+            param.delete('query');
+            history.replaceState(history.state, '', url.href)
+            go_products()
+        }
+        resultBoxB1.innerHTML = '';
+        return;
+    } else {
+        param.delete('query');
+        history.replaceState(history.state, '', url.href)
+    }
     if (input1.length) {
-        result1 = availKey.filter((keyword)=>{
+        result1 = availKey.filter((keyword) => {
             return keyword.toLowerCase().includes(input1.toLowerCase());
         });
         console.log(result1)
     }
     display_b1(result1)
-    param.append('query',input1 = inputBox.value )
+    param.append('query', input1 = inputBox.value)
     history.replaceState(history.state, '', url.href)
-
-
-
+    go_products()
 }
 function display_b1(result){
     const content = result.map((list)=>{
@@ -505,5 +524,5 @@ function selectInput_b1(list){
     inputBox.value = list.innerHTML
     resultBoxB1.innerHTML = '';
 }
-
+// *****************************
 

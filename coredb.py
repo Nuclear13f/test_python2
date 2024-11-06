@@ -1,7 +1,7 @@
 from config import session_factory, sync_engine
 from sqlalchemy import Integer, and_, func, insert, select, text, update, func, cast, delete, or_
 from model import type_products, s1_products, s2_products, s3_products, products, provider
-
+from sqlalchemy.orm import joinedload, selectinload
 
 def select_type_products(self):
     with session_factory() as session:
@@ -31,17 +31,39 @@ def select_type_products(self):
         dict = {'type': resu, 's1': resu2, 's2': resu3, 's3': resu4}
     return (dict)
 
+
+
+def sel_products_input_check(id, q):
+    p_id_provider = id
+    p_query = q
+    with session_factory() as session:
+        query = select(products.name_product, products.id_product,  func.similarity(products.name_product, p_query).label('simi'),).\
+            filter(products.provider_id==int(p_id_provider)).where(products.name_product.bool_op('%')(p_query)).\
+            order_by(func.similarity(products.name_product, p_query).desc()).limit(3)
+        # query = select(products.name_product).where(products.name_product.bool_op('%')('Аккумулятор'))
+        # query = select(products, func.count(products.name_product).label("sss")).where(products.name_product.bool_op('%')('Аккумулятор')).group_by(products.id)
+        # query = select(products.name_product, func.similarity(products.name_product, 'Аккумулятор'))
+        res = session.execute(query).all()
+        dict_data = []
+        for w in res:
+            dict_data.append({'name_product': w.name_product, 'similarity': w.simi, 'id_product': w.id_product})
+        dict = {'data': dict_data}
+    return (dict)
+
+
 def select_products(flag, page):
     param_type = []
     param_provider = []
+    param_query = ''
     if flag['type']:
         for w in flag['type']:
             param_type.append(int(w))
     if flag['provider']:
         for w in flag['provider']:
             param_provider.append(int(w))
-
-    print('param', param_provider)
+    if flag['query']:
+        param_query = str(flag['query'])
+    print(param_query)
     # if flag:
     #     for w in flag:
     #         if w['type']:
@@ -60,16 +82,37 @@ def select_products(flag, page):
             query_filter.append(products.type_product_id.in_(param_type))
         if param_provider:
             query_filter.append(products.provider_id.in_(param_provider))
-        query = (select(products).filter(*query_filter))
+        # query = (select(products).filter(products.s2.has(s2_products.name_s2=='Щит')))
+
+        # query = (select(products).join(s2_products).filter(and_(func.similarity(products.name_product, 'Болт') > 0.3,
+        #     func.similarity(s2_products.name_s2, 'Болт') > 0.5)))
+
+        query = select(products).join(s2_products).filter(func.similarity(products.name_product, 'Болт') > 0.2).filter(func.similarity(s2_products.name_s2, 'Болт') > 0.1)
+
+
+
+
+        # query = (select(products).filter(*query_filter))
+        # query = (select(products).filter(*query_filter)).filter(func.similarity(products.s2.name_s2, 'Щит') > 0.2)
+        # query = (select(products).filter(*query_filter)).filter(products.name_product.match(param_query))
+
+        # query = (select(products).filter(*query_filter)).filter(func.similarity(products.s2.has(s2_products.name_s2), 'Щит') > 0.2)
+
+        # res = session.query(Person).filter(Person.name.match('foo')).all(
+        # query = (select(products).filter(*query_filter)).filter(func.similarity(products.s2.name_s2, param_query) > 0.2)
+
         # query = (select(func.show_trgm(products.name_product)))
-        # query = select(products.name_product, func.similarity(products.name_product, 'Веник')).where(products.name_product.bool_op('%')('Веник'))
+        # query = select(products, func.similarity(products.name_product, 'Аккумулятор')).where(products.name_product.bool_op('%')('Аккумулятор'))
         # query = select(products.name_product, func.similarity(products.name_product, 'fdsdfdfsd dsdasa awad'))
-        # query = select(products).filter(func.similarity(products.name_product, '') > 0.5)
+        # query = select(products).filter(func.similarity(products.name_product, 'плитка напольная') > 0.2)
         # query = select(products.name_product.match('Веник'))
+        # query = select(products).filter(products.name_product.match('плитка настенн зоопарк') )
+
 
         res = session.execute(query).scalars().all()
-        # for w in res:
-        #     print(w.name_product)
+
+        for w in res:
+            print(w.name_product)
 
         count = len(res)
         query = query.limit(page['limit'])
@@ -80,8 +123,9 @@ def select_products(flag, page):
             str1 = str(w.provider_id) + ".png"
             str2 = str(w.provider.provider).replace("\"",'&#39;').replace("\"",'&#187;')
             dict_data.append({'id': w.id, 'name_product': w.name_product, 'id_product': w.id_product, 'img_product': w.img_name, 'img_logo': str1, 'provider': str2})
+            print(w.s2.name_s2)
         dict = {'count': count, 'data': dict_data}
-    return(dict)
+    return('dict')
 
 def get_data_provider(self):
     print('get_provider 1')
@@ -123,4 +167,19 @@ def mod_sql_products(dict1):
             session.flush()
             session.commit()
 
+
+def max_id_prod(id):
+    with session_factory() as session:
+        search = "%PD" + id + "%"
+        query = select(products.id_product).filter(products.provider_id==int(id)).filter(products.id_product.ilike(search))
+        res = session.execute(query).scalars().all()
+        mass = []
+        max_id = ''
+        if res:
+            for r in res:
+                mass.append(int(str(r).split('/')[1]))
+            max_id = str(max(mass) + 1)
+        else: max_id = '1'
+        return (max_id)
+    pass
 
