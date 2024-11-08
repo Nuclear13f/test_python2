@@ -3,33 +3,33 @@ from sqlalchemy import Integer, and_, func, insert, select, text, update, func, 
 from model import type_products, s1_products, s2_products, s3_products, products, provider
 from sqlalchemy.orm import joinedload, selectinload
 
-def select_type_products(self):
-    with session_factory() as session:
-        query = (
-            select(type_products)
-        )
-        res = session.execute(query)
-        resu = res.scalars().all()
-    with session_factory() as session:
-        query = (
-            select(s1_products)
-        )
-        res2 = session.execute(query)
-        resu2 = res2.scalars().all()
-    with session_factory() as session:
-        query = (
-            select(s2_products)
-        )
-        res3 = session.execute(query)
-        resu3 = res3.scalars().all()
-    with session_factory() as session:
-        query = (
-            select(s3_products)
-        )
-        res4 = session.execute(query)
-        resu4 = res4.scalars().all()
-        dict = {'type': resu, 's1': resu2, 's2': resu3, 's3': resu4}
-    return (dict)
+# def select_type_products(self):
+#     with session_factory() as session:
+#         query = (
+#             select(type_products)
+#         )
+#         res = session.execute(query)
+#         resu = res.scalars().all()
+#     with session_factory() as session:
+#         query = (
+#             select(s1_products)
+#         )
+#         res2 = session.execute(query)
+#         resu2 = res2.scalars().all()
+#     with session_factory() as session:
+#         query = (
+#             select(s2_products)
+#         )
+#         res3 = session.execute(query)
+#         resu3 = res3.scalars().all()
+#     with session_factory() as session:
+#         query = (
+#             select(s3_products)
+#         )
+#         res4 = session.execute(query)
+#         resu4 = res4.scalars().all()
+#         dict = {'type': resu, 's1': resu2, 's2': resu3, 's3': resu4}
+#     return (dict)
 
 
 
@@ -181,5 +181,23 @@ def max_id_prod(id):
             max_id = str(max(mass) + 1)
         else: max_id = '1'
         return (max_id)
-    pass
 
+def select_type_products(self):
+    dict = [];
+    with session_factory() as session:
+        query = (select(type_products))
+        rType = session.execute(query).scalars().all()
+    with session_factory() as session:
+        query = (select(s1_products))
+        rS1 = session.execute(query).scalars().all()
+    with session_factory() as session:
+        query = (select(s2_products.id, s2_products.name_s2, s2_products.s1_product_id))
+        rS2 = session.execute(query).all()
+    with session_factory() as session:
+        query = (select(s3_products))
+        rS3 = session.execute(query).scalars().all()
+    dict = {'type': rType, 's1': rS1, 's2': rS2, 's3': rS3}
+    for d in rS2:
+        print(d[1])
+    # dict = {'type': rType, 's1': rS1}
+    return (dict)

@@ -5,6 +5,7 @@ from model import users
 from flask_bcrypt import Bcrypt
 from coredb import select_type_products, select_products, get_data_provider,sel_products_input_check, max_id_prod
 import copy
+from collections import defaultdict
 import json
 
 
@@ -164,6 +165,33 @@ def get_prd_f_inp_prd():
 def get_id_max_product():
     data = request.get_json()
     data = max_id_prod(data);
+    res = select_type_products('1');
+    # type = res['type']
+    # s1 = res['s1']
+    # s2 = res['s2']
+    # s3 = res['s3']
+    # dict_type = []
+    # dict_s1 = []
+    # dict_s2 = []
+    # dict_s3 = []
+    # empl_globe = []
+    # for p in type:
+    #     for p2 in s1:
+    #         if p.id == p2.type_product_id:
+    #             for p3 in s2:
+    #                 if p2.id == p3.s1_product_id:
+    #                     for p4 in s3:
+    #                         if p3.id == p4.s2_product_id:
+    #                             dict_s3.append({'id': p4.id, 'name': p4.name_s3})
+    #                     dict_s2.append({'id': p3.id, 'name': p3.name_s2, 'child': copy.copy(dict_s3)})
+    #                     dict_s3.clear();
+    #             dict_s1.append({'id': p2.id, 'name': p2.name_s1, 'child': copy.copy(dict_s2)})
+    #             dict_s2.clear();
+    #     dict_type.append({'id': p.id, 'name': p.name_type_product, 'child': copy.copy(dict_s1)})
+    #     dict_s1.clear();
+    #
+    # empl_globe.append(dict_type)
+
     return jsonify(data)
 
 
