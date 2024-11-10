@@ -81,7 +81,22 @@ go_provider()
 $("select[name='id_prov_SDS_1']").bind("change", function (){
     const s = $("select[name='id_prov_SDS_1']").val()
     render =  get_id_max_product(s)
-    console.log(render)
+
+    render.then(r =>{
+            console.log(r)
+        r['data'].forEach( d => {
+            console.log(d)
+            console.log(d['name'][''])
+            d.forEach( s =>{
+                console.log(s)
+                s['child'].forEach(t =>{
+                })
+            })
+        })
+    })
+
+
+
     render.then(r => {
         const elem_row_text = document.querySelectorAll(".inp5432_row")
         let s1 = elem_row_text[0].querySelector('div[name="max_id_prv"]')

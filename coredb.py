@@ -185,19 +185,17 @@ def max_id_prod(id):
 def select_type_products(self):
     dict = [];
     with session_factory() as session:
-        query = (select(type_products))
-        rType = session.execute(query).scalars().all()
+        query = (select(type_products.id, type_products.name_type_product))
+        rType = session.execute(query).all()
     with session_factory() as session:
-        query = (select(s1_products))
-        rS1 = session.execute(query).scalars().all()
+        query = (select(s1_products.id, s1_products.name_s1, s1_products.type_product_id))
+        rS1 = session.execute(query).all()
     with session_factory() as session:
         query = (select(s2_products.id, s2_products.name_s2, s2_products.s1_product_id))
         rS2 = session.execute(query).all()
     with session_factory() as session:
-        query = (select(s3_products))
-        rS3 = session.execute(query).scalars().all()
+        query = (select(s3_products.id, s3_products.name_s3, s3_products.s2_product_id))
+        rS3 = session.execute(query).all()
     dict = {'type': rType, 's1': rS1, 's2': rS2, 's3': rS3}
-    for d in rS2:
-        print(d[1])
     # dict = {'type': rType, 's1': rS1}
     return (dict)
