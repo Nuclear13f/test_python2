@@ -3,7 +3,8 @@ from flask import Blueprint, render_template, request, redirect, url_for, jsonif
 from flask_login import login_required, current_user, logout_user, login_user
 from model import users
 from flask_bcrypt import Bcrypt
-from coredb import select_type_products, select_products, get_data_provider,sel_products_input_check, max_id_prod
+from coredb import select_type_products, select_products, get_data_provider,sel_products_input_check, max_id_prod, \
+    sel_products_check_stat
 import copy
 from collections import defaultdict
 import json
@@ -165,31 +166,20 @@ def get_prd_f_inp_prd():
 def get_id_max_product():
     data = request.get_json()
     data = max_id_prod(data);
-    res = select_type_products('1');
-    type = res['type']
-    s1 = res['s1']
-    s2 = res['s2']
-    s3 = res['s3']
-    dict_type = []
-    dict_s1 = []
-    dict_s2 = []
-    # dict_s3 = []
+    return jsonify(data)
 
-    for p in type:
-        for p2 in s1:
-            if p[0] == p2[2]:
-    #             for p3 in s2:
-    #                 if p2.id == p3.s1_product_id:
-    #                     for p4 in s3:
-    #                         if p3.id == p4.s2_product_id:
-    #                             dict_s3.append({'id': p4.id, 'name': p4.name_s3})
-    #                     dict_s2.append({'id': p3.id, 'name': p3.name_s2, 'child': copy.copy(dict_s3)})
-    #                     dict_s3.clear();
-                dict_s1.append({'id': p2[0], 'name': p2[1], 'child': copy.copy(dict_s2)})
-                dict_s2.clear();
-        dict_type.append({'id': p[0], 'name': p[1], 'child': copy.copy(dict_s1)})
-        dict_s1.clear();
-    return jsonify({'data': dict_type})
+@auth.route('/get_product_check_stat', methods=['GET', 'POST'])
+@login_required
+def get_product_check_stat():
+    data = request.get_json()
+    data = sel_products_check_stat(data);
+    return jsonify(data)
+
+
+
+
+
+
 
 
 @auth.route('/get_provider', methods=['GET', 'POST'])
@@ -203,38 +193,30 @@ def get_provider():
 @login_required
 def stat_products():
     data = request.get_json()
-    print('1')
-    print(data)
-    print(data['con'])
-    print(data['sas'])
-    dd = data['sas']
-    print(dd['s'])
-
-
-    prov = select_type_products(id)
-    type = prov['type']
-    s1 = prov['s1']
-    s2 = prov['s2']
-    s3 = prov['s3']
+    res = select_type_products();
+    type = res['type']
+    s1 = res['s1']
+    s2 = res['s2']
+    s3 = res['s3']
     dict_type = []
     dict_s1 = []
     dict_s2 = []
     dict_s3 = []
     for p in type:
         for p2 in s1:
-            if p.id == p2.type_product_id:
+            if p[0] == p2[2]:
                 for p3 in s2:
-                    if p2.id == p3.s1_product_id:
+                    if p2[0] == p3[2]:
                         for p4 in s3:
-                            if p3.id == p4.s2_product_id:
-                                dict_s3.append({'id': p4.id, 'name': p4.name_s3})
-                        dict_s2.append({'id': p3.id, 'name': p3.name_s2, 'child': copy.copy(dict_s3)})
+                            if p3[0] == p4[2]:
+                                dict_s3.append({'id': p4[0], 'name': p4[1]})
+                        dict_s2.append({'id': p3[0], 'name': p3[1], 'child': copy.copy(dict_s3)})
                         dict_s3.clear();
-                dict_s1.append({'id': p2.id, 'name': p2.name_s1, 'child': copy.copy(dict_s2)})
+                dict_s1.append({'id': p2[0], 'name': p2[1], 'child': copy.copy(dict_s2)})
                 dict_s2.clear();
-        dict_type.append({'id': p.id, 'name': p.name_type_product, 'child': copy.copy(dict_s1)})
+        dict_type.append({'id': p[0], 'name': p[1], 'child': copy.copy(dict_s1)})
         dict_s1.clear();
-    return jsonify(dict_type)
+    return jsonify({'data': dict_type})
 
 
 @auth.route('/unload_1', methods=['GET', 'POST'])

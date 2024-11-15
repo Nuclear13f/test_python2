@@ -143,6 +143,8 @@ button .fa-solid {
     position: absolute;
     top: 0;
     background: white;
+    padding-top: 10px;
+    line-height: normal;
     /*left: -150px;*/
 
 }
@@ -152,6 +154,13 @@ button .fa-solid {
       overflow-y: auto;
     overflow-x: hidden;
 }
+
+.result-box_b2_sub ul{
+    margin-bottom: 10px;
+}
+
+
+
 
 .li_b123 {
     margin-bottom: 0px;
@@ -173,9 +182,15 @@ button .fa-solid {
 .result-box_b2 ul li li:hover {
     background: #e9f3ff;
 }
+
+.result-box_b2_sub:hover {
+    background: #e9f3ff;
+}
+
+
 .footer-box_b2 {
     display: flex;
-    flex-direction: row
+    flex-direction: row;
 }
 .footer-box_b2_1 {
     margin-left: 30px;
@@ -186,7 +201,7 @@ button .fa-solid {
     margin-top: 7px
 }
 
-.footer-box_b2_3 {
+.footer-box_b2_3  {
     font-style: italic;
     font-size: 10px;
     white-space: nowrap;
@@ -195,6 +210,12 @@ button .fa-solid {
     padding-right: 3px
 }
 
+.footer-box_b2_3_stat {
+    color: darkred;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 /**************************************/
 
 

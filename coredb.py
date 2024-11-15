@@ -1,5 +1,5 @@
 from config import session_factory, sync_engine
-from sqlalchemy import Integer, and_, func, insert, select, text, update, func, cast, delete, or_
+from sqlalchemy import Integer, and_, func, insert, select, text, update, func, cast, delete, or_, desc
 from model import type_products, s1_products, s2_products, s3_products, products, provider
 from sqlalchemy.orm import joinedload, selectinload
 
@@ -48,6 +48,33 @@ def sel_products_input_check(id, q):
         for w in res:
             dict_data.append({'name_product': w.name_product, 'similarity': w.simi, 'id_product': w.id_product})
         dict = {'data': dict_data}
+    return (dict)
+
+def sel_products_check_stat(text):
+    dict_data = []
+    with session_factory() as session:
+        query = select(products.name_product, products.id_product,
+                       products.type_product_id, products.s1_id, products.s2_id, products.s3_id,
+                       func.similarity(products.name_product, text).label('simi'), ).where(products.name_product.bool_op('%')(text)). \
+            order_by(func.similarity(products.name_product, text).desc())
+    res = session.execute(query).all()
+    arrG = []
+    arrTemp = []
+    for w in res:
+        arrTemp = [w.type_product_id, w.s1_id, w.s2_id, w.s3_id]
+        flg = False
+        if not arrG:
+            arrG.append([arrTemp, 1])
+        else:
+            for s in arrG:
+                if s[0] == arrTemp:
+                    s[1] = s[1] + 1
+                    flg = True
+            if flg == False:
+                arrG.append([arrTemp, 1])
+    for i in range(len(arrG)):
+        dict_data.append({'stat': arrG[i][0], 'similarity': round((arrG[i][1] / len(res)), 2)})
+    dict = {'data': dict_data}
     return (dict)
 
 
@@ -182,20 +209,20 @@ def max_id_prod(id):
         else: max_id = '1'
         return (max_id)
 
-def select_type_products(self):
+def select_type_products():
     dict = [];
     with session_factory() as session:
         query = (select(type_products.id, type_products.name_type_product))
         rType = session.execute(query).all()
     with session_factory() as session:
-        query = (select(s1_products.id, s1_products.name_s1, s1_products.type_product_id))
+        query = (select(s1_products.id, s1_products.name_s1, s1_products.type_product_id)).order_by(s1_products.name_s1)
+                                                            # order_by(desc(s1_products.name_s1)) sort в обратном порядке
         rS1 = session.execute(query).all()
     with session_factory() as session:
-        query = (select(s2_products.id, s2_products.name_s2, s2_products.s1_product_id))
+        query = (select(s2_products.id, s2_products.name_s2, s2_products.s1_product_id)).order_by(s2_products.name_s2)
         rS2 = session.execute(query).all()
     with session_factory() as session:
-        query = (select(s3_products.id, s3_products.name_s3, s3_products.s2_product_id))
+        query = (select(s3_products.id, s3_products.name_s3, s3_products.s2_product_id)).order_by(s3_products.name_s3)
         rS3 = session.execute(query).all()
     dict = {'type': rType, 's1': rS1, 's2': rS2, 's3': rS3}
-    # dict = {'type': rType, 's1': rS1}
     return (dict)

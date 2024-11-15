@@ -155,13 +155,13 @@ async function get_stat() {
             "sas": {"s": 1, "b": 2}
         }
 
-const test = JSON.stringify(newPost) //Оборочиваем в строку JSON
+    const test = JSON.stringify(newPost) //Оборочиваем в строку JSON
 
     const result = await $.ajax({
         url: '/get_stat_product',
         method: 'post',
         contentType: 'application/json',
-        data:  test,
+        data: test,
     });
     return result;
 }
