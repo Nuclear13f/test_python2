@@ -152,7 +152,7 @@ def select_products(flag, page):
             dict_data.append({'id': w.id, 'name_product': w.name_product, 'id_product': w.id_product, 'img_product': w.img_name, 'img_logo': str1, 'provider': str2})
             print(w.s2.name_s2)
         dict = {'count': count, 'data': dict_data}
-    return('dict')
+    return(dict)
 
 def get_data_provider(self):
     print('get_provider 1')
