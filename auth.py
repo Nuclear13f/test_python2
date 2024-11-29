@@ -5,7 +5,8 @@ from model import users
 from flask_bcrypt import Bcrypt
 from coredb import select_type_products, select_products, get_data_provider,sel_products_input_check, max_id_prod, \
     sel_products_check_stat
-import copy
+import os, sys, glob, shutil, time, copy
+from excel import CoreXLSX
 from collections import defaultdict
 import json
 
@@ -73,21 +74,14 @@ def grid():
 def login():
     from main import bcrypt
     if request.method == 'POST':
-        print('Тута')
-        # password = request.form.get('password')
         login = request.form['login']
         password = request.form['pass']
-        print(password)
-        print(login)
         user = users.query.filter_by(login=login).first()
-        print(user)
         if user:
             if bcrypt.check_password_hash(user.hash_password, password):
                 login_user(user, remember=True)
-                print('УРЯЯЯЯЯЯЯЯЯЯЯЯ')
                 # return render_template("home.html", user=current_user, master='GGG')
                 return jsonify('success')
-            print("Есть такой пользователь")
         else: print('Нет такого пользователя')
 
 
@@ -177,14 +171,8 @@ def get_product_check_stat():
 
 
 
-
-
-
-
-
 @auth.route('/get_provider', methods=['GET', 'POST'])
 def get_provider():
-    print('Шаг 1')
     prov = get_data_provider(id)
     return jsonify(prov)
 
@@ -225,6 +213,31 @@ def unload1():
     data = request.form
     print('fsfsfsfsfsdfsdfsd')
     print(data)
+
+@auth.route('/unload_xlsx_input', methods=['GET', 'POST'])
+@login_required
+def unload_xlsx_input():
+    if request.method == 'POST':
+        f = request.files['file']
+        uuid = request.form['uuid']
+        filename = f.filename
+        path = "unload//xlsx_input"
+        if os.path.isdir(path):
+            shutil.rmtree(path)
+            os.mkdir(path)
+        else:
+            os.mkdir(path)
+        f.save(os.path.join(path, filename))
+        f.close()
+        data = CoreXLSX.read_xlsx_products("unload//xlsx_input//" + filename)
+        if data['status'] == 'err':
+            dict = {'status': 'err'}
+        else:
+            dict = {'status': 'ok', 'data': []}
+    return jsonify(dict)
+
+
+
 
 @auth.route('/testRequest', methods=['GET', 'POST'])
 @login_required

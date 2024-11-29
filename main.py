@@ -3,10 +3,6 @@ from flask_bcrypt import Bcrypt
 
 
 
-
-
-
-
 app = create_app()
 bcrypt = Bcrypt(app)
 

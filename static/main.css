@@ -52,7 +52,7 @@
 }
 .das_122 {
     display: none;
-    /*position: relative;*/
+    position: relative;
 }
 
 .das_122::before {
@@ -129,15 +129,12 @@ button .fa-solid {
     background: #e9f3ff;
 }
 
+
+
+/*#region Модальное окно*/
 .result-box_b2 > * {
     font-family: PT-Roboto;
 }
-
-
-
-
-
-
 
 .result-box_b2 {
     box-shadow: 0 24px 38px #445c8224,0 9px 46px #445c821f,0 11px 15px #445c8205;
@@ -145,7 +142,7 @@ button .fa-solid {
     width: 500px;
     border-radius: 3px;
     z-index: 2;
-    position: absolute;
+    /* position: absolute; */
     top: 0;
     background: white;
     padding-top: 10px;
@@ -156,15 +153,13 @@ button .fa-solid {
 
 .result-box_b2_sub {
     max-height: 300px;
-      overflow-y: auto;
+    overflow-y: auto;
     overflow-x: hidden;
 }
 
 .result-box_b2_sub ul{
-    margin-bottom: 10px;
+    margin-bottom: 0px;
 }
-
-
 
 
 .li_b123 {
@@ -184,14 +179,22 @@ button .fa-solid {
     font-size: 12px;
 }
 
-.result-box_b2 ul li li:hover {
+.result-box_b2 ul li:hover {
     background: #e9f3ff;
 }
 
-.result-box_b2_sub:hover {
+/* .result-box_b2_sub:hover {
+    background: #e9f3ff;
+} */
+
+.rbb2s:hover {
     background: #e9f3ff;
 }
 
+
+/* .result-box_b2_sub_mini:hover {
+    background: #e9f3ff;
+} */
 
 .footer-box_b2 {
     display: flex;
@@ -203,7 +206,8 @@ button .fa-solid {
 }
 .footer-box_b2_2 {
     margin-bottom: 7px;
-    margin-top: 7px
+    margin-top: 7px;
+    padding-left: 40px;
 }
 
 .footer-box_b2_3  {
@@ -212,7 +216,8 @@ button .fa-solid {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    padding-right: 3px
+    padding-right: 3px;
+    text-align: left;
 }
 
 .footer-box_b2_3_stat {
@@ -221,6 +226,7 @@ button .fa-solid {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
 /**************************************/
 
 

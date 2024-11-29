@@ -1,6 +1,7 @@
 from config import session_factory, sync_engine
 from sqlalchemy import Integer, and_, func, insert, select, text, update, func, cast, delete, or_, desc
 from model import type_products, s1_products, s2_products, s3_products, products, provider
+import time
 from sqlalchemy.orm import joinedload, selectinload
 
 # def select_type_products(self):
@@ -75,6 +76,7 @@ def sel_products_check_stat(text):
     for i in range(len(arrG)):
         dict_data.append({'stat': arrG[i][0], 'similarity': round((arrG[i][1] / len(res)), 2)})
     dict = {'data': dict_data}
+    print(dict)
     return (dict)
 
 
@@ -110,16 +112,15 @@ def select_products(flag, page):
         if param_provider:
             query_filter.append(products.provider_id.in_(param_provider))
         # query = (select(products).filter(products.s2.has(s2_products.name_s2=='Щит')))
-
         # query = (select(products).join(s2_products).filter(and_(func.similarity(products.name_product, 'Болт') > 0.3,
         #     func.similarity(s2_products.name_s2, 'Болт') > 0.5)))
 
-        query = select(products).join(s2_products).filter(func.similarity(products.name_product, 'Болт') > 0.2).filter(func.similarity(s2_products.name_s2, 'Болт') > 0.1)
+
+        # query = select(products).join(s2_products).filter(func.similarity(products.name_product, 'Болт') > 0.2).filter(func.similarity(s2_products.name_s2, 'Болт') > 0.1)
+
+        query = (select(products).filter(*query_filter))
 
 
-
-
-        # query = (select(products).filter(*query_filter))
         # query = (select(products).filter(*query_filter)).filter(func.similarity(products.s2.name_s2, 'Щит') > 0.2)
         # query = (select(products).filter(*query_filter)).filter(products.name_product.match(param_query))
 
@@ -137,9 +138,6 @@ def select_products(flag, page):
 
 
         res = session.execute(query).scalars().all()
-
-        for w in res:
-            print(w.name_product)
 
         count = len(res)
         query = query.limit(page['limit'])
@@ -163,7 +161,7 @@ def get_data_provider(self):
         )
         res = session.execute(query).scalars().all()
         for w in res:
-            dict_data.append({'id': w.id, 'name_provider': w.provider})
+            dict_data.append({'id': w.id, 'name_provider': w.provider, 'flg_own_ip': w.flg_own_id})
         dict = {'name': 'provider', 'data': dict_data}
         return (dict)
 
@@ -225,4 +223,19 @@ def select_type_products():
         query = (select(s3_products.id, s3_products.name_s3, s3_products.s2_product_id)).order_by(s3_products.name_s3)
         rS3 = session.execute(query).all()
     dict = {'type': rType, 's1': rS1, 's2': rS2, 's3': rS3}
+
     return (dict)
+
+def check_prod(rows):
+    with session_factory() as session:
+        start = time.time()
+        for c1, c2 in rows:
+            ids = str(c1.value).strip()
+            query = select(products.id_product).filter_by(id_product=ids)
+            res = session.execute(query).all()
+            if res:
+                print('ok')
+            else: print('not')
+        stop = time.time()
+        s = stop-start
+        print('\n', round(s,6), 'сек.')

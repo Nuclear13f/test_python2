@@ -2,8 +2,10 @@ const btn_add_row = document.getElementById('ds_input_51')
 btn_add_row.addEventListener('click', hClick1)
 let max_count = '';
 let stat_data = '';
+let gIdRow = ""
+let dataInpRow = {gIdRow1: "", idStat: []}
 
-// ****************  Кнопка добавить ******************************
+// region ***********  Кнопка добавить ******************************
 function hClick1() {
     const elem_row = document.querySelector("#inp5432").children
     for (let i = 0; i < elem_row.length; i++) {
@@ -15,6 +17,8 @@ function hClick1() {
             array[1].children[1].remove()
             elem_row_clone.children[1].children[0].style.display = 'block'
             document.querySelector("#inp5432").append(elem_row_clone)
+            elem_row_clone.setAttribute("id_row", i + 2)
+            elem_row_clone.children[0].children[1].children[0].children[4].children[0].setAttribute("id_check", i + 2)
             const btn_add_row = document.getElementById('ds_input_51')
             btn_add_row.addEventListener('click', hClick1)
             break
@@ -22,7 +26,9 @@ function hClick1() {
     }
 }
 
-// ****************  Кнопка удалить ******************************
+// endregion
+
+// region **********  Кнопка удалить ******************************
 $(document).on("click", '.inp5434', function (e) {
     const blc_row = document.getElementById('inp5432')
     let count = blc_row.children.length
@@ -35,25 +41,60 @@ $(document).on("click", '.inp5434', function (e) {
         e.target.parentElement.parentElement.parentElement.remove()
     }
 })
-// ****************  Кнопка check ******************************
+// endregion
+
+// region **********  Кнопка check ******************************
 $(document).on("click", '.inp5438', function (e) {
     parenElem = e.target.parentElement.parentElement.parentElement.parentElement
-
+    dataInpRow.gIdRow1 = e.target.getAttribute("id_check")
     textValue = parenElem.querySelector('.inp5432_row input').value
-    renders = get_check_stat_product(textValue)
+    // e.target.setAttribute("disabled", "")
+    func_check(textValue, e)
+})
 
-    renders.then(r => {
-        r['data'].forEach(s => {
-            const say = new ModalWin(s['similarity'], intToStrStat(stat_data, s['stat']))
-            e.target.parentElement.insertAdjacentHTML("beforeend", say.fly())
-            console.log(say.similarity)
-            console.log(say.arraStat)
-            say.f()
+async function func_check(es, e) {
+    const stat_int = await get_check_stat_product(es).then(data => { return data })
+    const stat_str = await stat_data.then(r => { return r })
+    const say = new ModalWin()
+    await stat_int['data'].forEach(d => {
+        say.arraStat = intToStrStat(stat_str, d['stat']);
+        say.similarity = d['similarity'];
+        say.dataSet = d['stat']
+        say.f()
+    })
+    e.target.parentElement.insertAdjacentHTML("beforeend", say.fs2())
+    await stat_int['data'].forEach(d => {
+        let str = d['stat']
+        let els1 = document.querySelector('[dataset="' + str + '"]')
+        els1.addEventListener('click', function (e) {
+            let elm1 = document.querySelector('[id_row="' + dataInpRow.gIdRow1 + '"]')
+            let elm2 = elm1.querySelectorAll('select')
+            dataInpRow.idStat = els1.getAttribute('dataset').split(",").map(string => +string)
+            elm2[0][0].removeAttribute('selected')
+            elm2[0][dataInpRow.idStat[0]].setAttribute('selected', "selected")
+            func_select_clear(elm2, 3)
+            for (let i = 0; i < dataInpRow.idStat.length; i++) {
+                if (i === 0) {
+                    func_select_1(elm2, 'type', dataInpRow.idStat[i], dataInpRow.idStat[1])
+                }
+                if (i === 1) {
+                    func_select_1(elm2, 's1', dataInpRow.idStat[i], dataInpRow.idStat[2])
+                }
+                if (i === 2) {
+                    func_select_1(elm2, 's2', dataInpRow.idStat[i], dataInpRow.idStat[3])
+                }
+            }
+            els1.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.remove()
         })
     })
+    const clsOL = document.getElementById("closeCheckS")
+    clsOL.addEventListener('click', function (event) {
+        e.target.parentElement.children[1].remove()
+    })
+}
 
+// endregion
 
-})
 
 $('#invalid-was-provider_1').select2({
     theme: "bootstrap-5",
@@ -84,6 +125,7 @@ async function go_provider() {
         eOption.textContent = d['name_provider']
         eOption.setAttribute('id', d['id'])
         eOption.setAttribute('value', d['id'])
+        eOption.setAttribute('flg_own', d['flg_own_ip'])
         stouts.append(eOption)
     })
     return render
@@ -91,70 +133,88 @@ async function go_provider() {
 
 go_provider()
 
+// region ********** модуль select **********
+
 $("select[name='id_prov_SDS_1']").bind("change", function () {
     const s = $("select[name='id_prov_SDS_1']").val()
+    // const s2 = $("select[name='id_prov_SDS_1']").find(':selected').data('flg_own')
+    const flg_own_id = $("select[name='id_prov_SDS_1']").find(':selected')[0].getAttribute("flg_own")
     render = get_id_max_product(s)
-
-
     render.then(r => {
         const elem_row_text = document.querySelectorAll(".inp5432_row")
         let s1 = elem_row_text[0].querySelector('div[name="max_id_prv"]')
-        s1.textContent = "PD" + s + "/" + r
-        max_count = r
+        let s2 = elem_row_text[0].querySelector('div[name="own_id_prv"]')
+        if (flg_own_id === 'true') {
+            s1.style.display = "none"
+            s2.style.display = "block"
+        } else {
+            s2.style.display = "none"
+            s1.style.display = "block"
+            s1.textContent = "PD" + s + "/" + r
+        }
+
+        // let s1 = elem_row_text[0].querySelector('div[name="max_id_prv"]')
+        // s1.textContent = "PD" + s + "/" + r
+        // max_count = r
     })
     let s1 = document.querySelector('.das_122')
     s1.style.display = "block"
 })
 
-
 $(document).on("change", "select[name=\'id_prov_SDS_2\']", function (e) {
-    // console.log(e.target.getAttribute('name_id'))
     let elem = e.target.parentElement.parentElement
     let elem2 = elem.querySelectorAll('select [name="id_prov_SDS_2"]')
     let elem3 = elem.getElementsByTagName('select')
-    console.log(elem3[0])
     if (e.target.getAttribute('name_id') === 'type') {
-        for (let i = elem3[1].length - 1; i >= 1; --i) {
-            elem3[1][i].remove();
-        }
-        for (let i = elem3[2].length - 1; i >= 1; --i) {
-            elem3[2][i].remove();
-        }
-        for (let i = elem3[3].length - 1; i >= 1; --i) {
-            elem3[3][i].remove();
-        }
-        stat_data.then(render => {
+        func_select_clear(elem3, 3)
+        func_select_1(elem3, 'type', e.target.value)
+
+    }
+    if (e.target.getAttribute('name_id') === 's1') {
+        func_select_clear(elem3, 2)
+        func_select_1(elem3, 's1', e.target.value)
+    }
+    if (e.target.getAttribute('name_id') === 's2') {
+        func_select_clear(elem3, 1)
+        func_select_1(elem3, 's2', e.target.value)
+
+    }
+})
+
+async function func_select_1(elem, type, id, selectedId) {
+    if (type === 'type') {
+        await stat_data.then(render => {
             render['data'].forEach(d => {
-                if (d['id'] == e.target.value) {
+                if (d['id'] == id) {
                     d['child'].forEach(s1 => {
                         let eOption = document.createElement('option')
                         eOption.textContent = s1['name']
                         eOption.setAttribute('id', s1['id'])
                         eOption.setAttribute('value', s1['id'])
-                        elem3[1].append(eOption)
+                        if (Number(s1['id']) === Number(selectedId)) {
+                            eOption.setAttribute('selected', 'selected')
+                        }
+                        elem[1].append(eOption)
                     })
                 }
             })
         })
     }
-    if (e.target.getAttribute('name_id') === 's1') {
-        for (let i = elem3[2].length - 1; i >= 1; --i) {
-            elem3[2][i].remove();
-        }
-        for (let i = elem3[3].length - 1; i >= 1; --i) {
-            elem3[3][i].remove();
-        }
-        stat_data.then(render => {
+    if (type === 's1') {
+        await stat_data.then(render => {
             render['data'].forEach(d => {
-                if (d['id'] == elem3[0].value) {
+                if (d['id'] == Number(elem[0].value)) {
                     d['child'].forEach(s1 => {
-                        if (s1['id'] == e.target.value) {
+                        if (s1['id'] == id) {
                             s1['child'].forEach(s2 => {
                                 let eOption = document.createElement('option')
                                 eOption.textContent = s2['name']
                                 eOption.setAttribute('id', s2['id'])
                                 eOption.setAttribute('value', s2['id'])
-                                elem3[2].append(eOption)
+                                if (Number(s2['id']) === Number(selectedId)) {
+                                    eOption.setAttribute('selected', 'selected')
+                                }
+                                elem[2].append(eOption)
                             })
                         }
                     })
@@ -162,23 +222,23 @@ $(document).on("change", "select[name=\'id_prov_SDS_2\']", function (e) {
             })
         })
     }
-    if (e.target.getAttribute('name_id') === 's2') {
-        for (let i = elem3[3].length - 1; i >= 1; --i) {
-            elem3[3][i].remove();
-        }
+    if (type === 's2') {
         stat_data.then(render => {
             render['data'].forEach(d => {
-                if (d['id'] == elem3[0].value) {
+                if (d['id'] == Number(elem[0].value)) {
                     d['child'].forEach(s1 => {
-                        if (s1['id'] == elem3[1].value) {
+                        if (s1['id'] == Number(elem[1].value)) {
                             s1['child'].forEach(s2 => {
-                                if (s2['id'] == e.target.value) {
+                                if (s2['id'] == id) {
                                     s2['child'].forEach(s3 => {
                                         let eOption = document.createElement('option')
                                         eOption.textContent = s3['name']
                                         eOption.setAttribute('id', s3['id'])
                                         eOption.setAttribute('value', s3['id'])
-                                        elem3[3].append(eOption)
+                                        if (Number(s3['id']) === Number(selectedId)) {
+                                            eOption.setAttribute('selected', 'selected')
+                                        }
+                                        elem[3].append(eOption)
                                     })
                                 }
                             })
@@ -188,17 +248,34 @@ $(document).on("change", "select[name=\'id_prov_SDS_2\']", function (e) {
             })
         })
     }
-})
+
+}
+
+function func_select_clear(elem, i) {
+    let j = 0;
+    while (j < i) {
+        for (let k = elem[3 - j].length - 1; k >= 1; --k) {
+            elem[3 - j][k].remove();
+        }
+        j++;
+    }
+}
+
+// endregion
+
+// region ********** Кнопка проверки совпадений **********
 
 const elem_row_3 = document.querySelector(".das_121")
 const elem_row_2 = document.querySelector(".das_122")
 elem_row_2.addEventListener('click', function (event) {
     let div = document.createElement('div')
     div.classList.add('G212G2')
+    div.style.position = 'absolute'
+    div.style.top = '0px'
+    div.style.zIndex = '999'
     elem_row_3.append(div)
     hClick3(event)
 })
-
 let hClick3 = (event) => {
     const elem_row_1 = document.querySelector(".G212G2")
     if (elem_row_1.children) {
@@ -266,6 +343,8 @@ let hClick3 = (event) => {
     })
 }
 
+// endregion ****************  ++++++++++++ ******************************
+
 async function get_products(q1) {
 
     const get_query = JSON.stringify(q1) //Оборочиваем в строку JSON
@@ -323,61 +402,77 @@ async function get_stat() {
 stat_data = get_stat()
 
 class ModalWin {
-    constructor(similarity, arraStat) {
+    constructor(similarity, arraStat, dataSet) {
         this.similarity = similarity
         this.arraStat = arraStat
+        this.dataSet = dataSet
+        this.str = ""
     }
+
     fly = () => {
         return '<div class="result-box_b2" style="position: relative"><div class="result-box_b2_sub">\n' +
             '<ul class="ul_23s"><li><div class="footer-box_b2_3 row">\n' +
             '<div class="footer-box_b2_3_stat col-1" style=" padding-left: 0">' + this.similarity + '</div>\n' +
-            '<div class="footer-box_b2_3_stat col-9">\n' +
-            'str</div>\n' +
+            '<div class="footer-box_b2_3_stat col-9">' + this.fs1() + '</div>\n' +
             '<div class="footer-box_b2_3_stat col-2" style=" padding-left: 0">\n' +
             '<a href="ds">Ввести</a></div></div></li></ul></div><div class="footer-box_b2">\n' +
             '<div class="footer-box_b2_1"></div><div class="footer-box_b2_2">\n' +
-            '<button type="button" class="btn btn-primary"\n' +
+            '<button  type="button" class="btn btn-primary"\n' +
             'style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">\n' +
             'Закрыть</button></div></div></div>'
     }
-    f = () =>{
-        // Материал &rarr; Отделочный материал &rarr; Плитка &rarr; Плитка настенная
-        let str = ""
-        console.log('stat', this.arraStat)
-        this.arraStat.forEach(r4 =>{
-            console.log(r4)
-            str = str + " " + r4
-        })
-        console.log(str)
-        return str
+
+    fs2 = () => {
+        return '<div class="result-box_b2" style="position: relative">' + this.str + '<div class="footer-box_b2">\n' +
+            '<div class="footer-box_b2_1"></div><div class="footer-box_b2_2">\n' +
+            '<button id="closeCheckS" type="button" class="btn btn-primary"\n' +
+            'style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">\n' +
+            'Закрыть</button></div></div></div>'
     }
 
+    f = () => {
+        this.str = this.str + '<div class="result-box_b2_sub"><ul class="ul_23s"> <li><div class="footer-box_b2_3 row">' +
+            '<div class="footer-box_b2_3_stat col-1" style=" padding-left: 0">' + this.similarity + ' </div>' +
+            '<div class="footer-box_b2_3_stat col-9">' + this.fs1() + '</div>' +
+            '<div class="footer-box_b2_3_stat col-2" style=" padding-left: 0">' +
+            '<a dataset = "' + this.dataSet + '" href="##">Ввести</a></div></div></li></ul></div>'
+        return this.str
+    }
 
+    fs1() {
+        let str = ""
+        this.arraStat.forEach(r => {
+            if (str === "") {
+                str = str + " " + r
+            } else {
+                str = str + " &rarr; " + r
+            }
+        })
+        return str
+    }
 }
 
 function intToStrStat(rend, mass) {
     massFinish = [];
-    rend.then(r => {
-        r['data'].forEach(d => {
-            if (d['id'] == mass[0]) {
-                massFinish.push(d['name'])
-                d['child'].forEach(s => {
-                    if (s['id'] == mass[1]) {
-                        massFinish.push(s['name'])
-                        s['child'].forEach(s2 => {
-                            if (s2['id'] == mass[2]) {
-                                massFinish.push(s2['name'])
-                                s2['child'].forEach(s3 => {
-                                    if (s3['id'] == mass[3]) {
-                                        massFinish.push(s3['name'])
-                                    }
-                                })
-                            }
-                        })
-                    }
-                })
-            }
-        })
+    rend['data'].forEach(d => {
+        if (d['id'] == mass[0]) {
+            massFinish.push(d['name'])
+            d['child'].forEach(s => {
+                if (s['id'] == mass[1]) {
+                    massFinish.push(s['name'])
+                    s['child'].forEach(s2 => {
+                        if (s2['id'] == mass[2]) {
+                            massFinish.push(s2['name'])
+                            s2['child'].forEach(s3 => {
+                                if (s3['id'] == mass[3]) {
+                                    massFinish.push(s3['name'])
+                                }
+                            })
+                        }
+                    })
+                }
+            })
+        }
     })
     return massFinish
 }

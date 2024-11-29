@@ -1,0 +1,8 @@
+Преобразование строки разделенную запятой в массив с int:
+   let str1 = '"1", "2"'
+   let mass = str1.split(",")
+   console.log(str1.map(string => +string))
+
+   JS:
+   let s = "a" + "b" + + "12"     - два +, приведение символа 12 в int
+

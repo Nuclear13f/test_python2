@@ -73,5 +73,8 @@ class provider(Base):
     manadger: Mapped[str]
     note: Mapped[str]
     stip_pay_agr: Mapped[str]
+    code_provider: Mapped[str]
+    flg_own_id: Mapped[bool]
+    cpp: Mapped[str]
     product: Mapped['products'] = relationship(back_populates='provider')
     # order_delay: Mapped['delay_order'] = relationship(back_populates='provider')
