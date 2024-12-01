@@ -228,14 +228,21 @@ def select_type_products():
 
 def check_prod(rows):
     with session_factory() as session:
+        exception_word = ['Доставка товара', 'Подъем']
         start = time.time()
+        dict = []
         for c1, c2 in rows:
-            ids = str(c1.value).strip()
-            query = select(products.id_product).filter_by(id_product=ids)
-            res = session.execute(query).all()
-            if res:
-                print('ok')
-            else: print('not')
+            if c1.value:
+                if not c2.value in exception_word:
+                    ids = str(c1.value).strip()
+                    query = select(products.id_product).filter_by(id_product=ids)
+                    res = session.execute(query).all()
+                    if res:
+                        dict.append({'id': c1.value, 'product': c2.value, 'flg': 'ok'})
+                    else:
+                        dict.append({'id': c1.value, 'product': c2.value, 'flg': 'err'})
         stop = time.time()
         s = stop-start
+        print(dict)
         print('\n', round(s,6), 'сек.')
+        return dict

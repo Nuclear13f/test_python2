@@ -233,7 +233,8 @@ def unload_xlsx_input():
         if data['status'] == 'err':
             dict = {'status': 'err'}
         else:
-            dict = {'status': 'ok', 'data': []}
+            dict = {'status': 'ok', 'data': data}
+        print(dict)
     return jsonify(dict)
 
 
