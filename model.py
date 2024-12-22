@@ -78,3 +78,157 @@ class provider(Base):
     cpp: Mapped[str]
     product: Mapped['products'] = relationship(back_populates='provider')
     # order_delay: Mapped['delay_order'] = relationship(back_populates='provider')
+
+class contracts(Base):
+    __tablename__ = 'contracts'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name_contract: Mapped[str]
+    client_id: Mapped[int] = mapped_column(ForeignKey('clients.id'))
+    adress_id: Mapped[int] = mapped_column(ForeignKey('adress_clients.id'))
+    company_id: Mapped[int] = mapped_column(ForeignKey('company.id'))
+    contract_price: Mapped[float]
+    contract_num: Mapped[str]
+    contract_date: Mapped[datetime.date]
+    status: Mapped[str]
+    contract_date_close: Mapped[datetime.date]
+    contract_price_close: Mapped[float]
+    contract_name_file: Mapped[str]
+    contract_exeс_period: Mapped[datetime.date]
+    note: Mapped[str]
+    client: Mapped['clients'] = relationship(back_populates='contract')
+    adress: Mapped['adress_client'] = relationship(back_populates='contract')
+    company: Mapped['company'] = relationship(back_populates='contract')
+
+class clients(Base):
+    __tablename__ = 'clients'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    full_name: Mapped[str]
+    little_name: Mapped[str]
+    inn: Mapped[str]
+    alias: Mapped[str]
+    update: Mapped[datetime.datetime] = mapped_column(server_default=func.now())  # используем лист при связи один ко многим
+    adress: Mapped[list['adress_client']] = relationship(back_populates='client')
+    contract: Mapped['contracts'] = relationship(back_populates='client')
+
+class adress_client(Base):
+    __tablename__ = 'adress_clients'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    adress: Mapped[str]
+    region: Mapped[str]
+    client_id: Mapped[int] = mapped_column(ForeignKey('clients.id'))
+    client: Mapped['clients'] = relationship(back_populates='adress')
+    contract: Mapped['contracts'] = relationship(back_populates='adress')
+
+class adress_refreshment(Base):
+    __tablename__ = 'adress_refreshment'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    id_contract: Mapped[int] = mapped_column(ForeignKey('contracts.id'))
+    id_adress: Mapped[int] = mapped_column(ForeignKey('adress_clients.id'))
+
+
+class order(Base):
+    __tablename__ = 'orders_'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    id_name: Mapped[str]
+    order_date: Mapped[datetime.date]
+    type: Mapped[str]
+    order_total: Mapped[float]
+    created: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
+    update: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
+    id_contract: Mapped[int] = mapped_column(ForeignKey('contracts.id'))
+    id_provider: Mapped[int] = mapped_column(ForeignKey('provider.id'))
+    id_adress_refreshment: Mapped[int] = mapped_column(ForeignKey('adress_clients.id'))
+    # client: Mapped['clients'] = relationship(back_populates='adress')
+    # contract: Mapped['contracts'] = relationship(back_populates='adress')
+
+
+class company(Base):
+    __tablename__ = 'company'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str]
+    adress: Mapped[str]
+    contract: Mapped['contracts'] = relationship(back_populates='company')
+class payment_(Base):
+    __tablename__ = 'payment_'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    payment_check: Mapped[float]
+    payment_date: Mapped[datetime.date]
+    note: Mapped[str]
+    account_number = Mapped[str]
+    created: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
+    update: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
+    id_order: Mapped[int] = mapped_column(ForeignKey('orders_.id'))
+    id_company: Mapped[int] = mapped_column(ForeignKey('company.id'))
+
+class item_orders(Base):
+    __tablename__ = 'item_orders'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    cost: Mapped[float]
+    amount: Mapped[float]
+    total: Mapped[float]
+    id_old_product = Mapped[str]
+    created: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
+    update: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
+    id_order: Mapped[int] = mapped_column(ForeignKey('orders_.id'))
+    id_product: Mapped[int] = mapped_column(ForeignKey('products.id'))
+
+class services_(Base):
+    __tablename__ = 'services_'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    id_contract: Mapped[int] = mapped_column(ForeignKey('contracts.id'))
+    id_provider: Mapped[int] = mapped_column(ForeignKey('provider.id'))
+    id_adress_refreshment: Mapped[int] = mapped_column(ForeignKey('adress_clients.id'))
+    name_service: Mapped[str]
+    service_date: Mapped[datetime.date]
+    cost_service: Mapped[float]
+    temp_col: Mapped[str] = mapped_column(String(20))
+    created: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
+    update: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
+
+
+class payment_services_(Base):
+    __tablename__ = 'payment_services_'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    id_service: Mapped[int] = mapped_column(ForeignKey('services_.id'))
+    id_company: Mapped[int] = mapped_column(ForeignKey('company.id'))
+    invoice_date: Mapped[datetime.date]
+    invoice_cost: Mapped[float]
+    invoice_number: Mapped[str]
+    created: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
+    update: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
+
+class payment_reimburs(Base):
+    __tablename__ = 'payment_reimburs'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    id_contract: Mapped[int] = mapped_column(ForeignKey('contracts.id'))
+    id_company: Mapped[int] = mapped_column(ForeignKey('company.id'))
+    id_adress_refreshment: Mapped[int] = mapped_column(ForeignKey('adress_clients.id'))
+    date_reimburs: Mapped[datetime.date]
+    name_reimburs: Mapped[float]
+    cost_reimburs: Mapped[float]
+    created: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
+    update: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
+
+class contractor_(Base):
+    __tablename__ = 'contractor_'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    id_contract: Mapped[int] = mapped_column(ForeignKey('contracts.id'))
+    id_customer: Mapped[int] = mapped_column(ForeignKey('company.id'))
+    id_provider: Mapped[int] = mapped_column(ForeignKey('provider.id'))
+    id_adress_refreshment: Mapped[int] = mapped_column(ForeignKey('adress_clients.id'))
+    name_contract: Mapped[str]
+    contract_num: Mapped[str]
+    contract_date: Mapped[datetime.date]
+    cost_contract: Mapped[float]
+    status: Mapped[str]
+    created: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
+    update: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
+
+class payment_contractor_(Base):
+    __tablename__ = 'payment_contractor_'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    id_contractor: Mapped[int] = mapped_column(ForeignKey('contractor_.id'))
+    date_payment: Mapped[datetime.date]
+    cost_payment: Mapped[float]
+    created: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
+    update: Mapped[datetime.datetime] = mapped_column(server_default=func.now())

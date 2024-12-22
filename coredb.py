@@ -1,7 +1,10 @@
 from config import session_factory, sync_engine
-from sqlalchemy import Integer, and_, func, insert, select, text, update, func, cast, delete, or_, desc
-from model import type_products, s1_products, s2_products, s3_products, products, provider
-import time
+from sqlalchemy.orm import aliased
+from sqlalchemy import Integer, and_, func, insert, select, text, update, func, cast, delete, or_, desc, Float
+from model import type_products, s1_products, s2_products, s3_products, products, provider, order, payment_, \
+    item_orders, services_, payment_services_, payment_reimburs, contractor_, payment_contractor_, clients\
+    , contracts, adress_client, adress_refreshment, company
+import time, datetime
 from sqlalchemy.orm import joinedload, selectinload
 
 # def select_type_products(self):
@@ -31,8 +34,6 @@ from sqlalchemy.orm import joinedload, selectinload
 #         resu4 = res4.scalars().all()
 #         dict = {'type': resu, 's1': resu2, 's2': resu3, 's3': resu4}
 #     return (dict)
-
-
 
 def sel_products_input_check(id, q):
     p_id_provider = id
@@ -226,6 +227,182 @@ def select_type_products():
 
     return (dict)
 
+def select_clients():
+    with session_factory() as session:
+        query = (select(clients)).order_by(clients.alias)
+        res = session.execute(query).scalars().all()
+        return res
+
+def select_contracts(id_client):
+    with session_factory() as session:
+        query = (select(contracts)).filter_by(client_id=int(id_client))
+        res = session.execute(query).scalars().all()
+        return res
+
+
+# select contracts.contract_num, clients.alias, sum(orders_.order_total)::int from orders_ join contracts on contracts.id = orders_.id_contract
+# join clients on clients.id = contracts.client_id group by contracts.contract_num, clients.alias
+def select_order(idContarct, idAdress):
+    with session_factory() as session:
+        c = aliased(contracts)
+        o = aliased(order)
+        i = aliased(item_orders)
+        cl = aliased(clients)
+        a = aliased(adress_client)
+        ar = aliased(adress_refreshment)
+        p = aliased(products)
+        pr = aliased(provider)
+        pay = aliased(payment_)
+        co = aliased(company)
+        query_filter_info = []
+        query_filter_order = []
+        js = []
+        if int(idAdress) > 0:
+            js.append(int(idAdress))
+            # query_filter_info.append(a.id.in_(js))
+            query_filter_order.append(o.id_adress_refreshment.in_(js))
+
+        qInfo = (select(c.contract_num, a.adress, ar.id_adress)).select_from(c).join(ar, c.id==ar.id_contract).\
+            join(a, a.id==ar.id_adress).filter(c.id==int(idContarct)).filter(*query_filter_info)
+        res = session.execute(qInfo)
+        result = res.all()
+        adress = [];
+        contract_num = '';
+        for d in result:
+            contract_num = d[0]
+            adress.append({'id': d[2], 'adress': d[1]})
+        s = {'contact_num': contract_num, 'adress': adress}
+        info = {'info': s}
+        print(info)
+
+        subq = (select(c.contract_num,
+                       func.sum(o.order_total).cast(Float).label('fffff')
+                       )
+                ).select_from(o).join(c, c.id==o.id_contract).filter(o.id_contract==int(idContarct)).\
+            filter(*query_filter_order).group_by(c.contract_num)
+        res = session.execute(subq)
+        result = res.all()
+        total = round(result[0][1], 2)
+
+        # subq = (select(c.contract_num, func.sum(o.order_total).cast(Float).label('fffff'))
+        #         ).select_from(o).join(c, c.id == o.id_contract).join(i, i.id_order == o.id).filter(
+        #     o.id_contract == int(idContarct)).group_by(c.contract_num)
+        qTBO = (select(c.contract_num, func.sum(i.total).cast(Float).label('fffff'))
+                ).select_from(o).join(c, c.id == o.id_contract).join(i, i.id_order == o.id).filter(
+            o.id_contract == int(idContarct)).filter(i.id_product == 11255).filter(*query_filter_order).group_by(c.contract_num)
+        res = session.execute(qTBO)
+        result = res.all()
+        tbo = 0
+        if result:
+            tbo = result[0][1]
+        else: tbo = 0
+        dict = []
+        dict.append(info)
+        dict.append({'total': total})
+        dict.append({'tbo': tbo})
+
+        qOrder =  (select(o.id, o.id_name, o.order_date, o.order_total, pr.provider)).\
+            join(pr, pr.id == o.id_provider).filter(o.id_contract==int(idContarct)).filter(*query_filter_order)
+        res = session.execute(qOrder)
+        result = res.all()
+        dictOrder = []
+        companyPay = ''
+        for d in result:
+            qItem = (select(i.id_product, i.cost, i.amount, i.total, p.name_product)).join(p, p.id == i.id_product).\
+                filter(i.id_order == int(d[0]))
+            res_i = session.execute(qItem)
+            result_i = res_i.all()
+            dict_i = []
+            flgItem = 'ok'
+            flgPay = 'err'
+            if result_i:
+                for u in result_i:
+                    dict_i.append({'id': u.id_product, 'name': u.name_product, 'cost': u.cost, 'amount': u.amount, 'total': u.total})
+            else: flgItem = 'err'
+            strComp = ''
+            qPay = (select(pay.payment_check, co.name)).select_from(pay).join(co, co.id == pay.id_company).filter(pay.id_order == int(d[0]))
+            res_pay = session.execute(qPay)
+            result_pay = res_pay.all()
+            if result_pay:
+                flgPay = 'ok'
+                strComp = result_pay[0][1]
+
+            dictOrder.append({'order': d[1], 'date': d[2], 'total': d[3], 'items': dict_i, 'provider': d[4],
+                              'flgItem': flgItem, 'flgPay': flgPay, 'company': strComp})
+        dict.append({'ORDER': dictOrder})
+        return dict
+
+
+def select_service(idContarct, idAdress):
+    with session_factory() as session:
+        print('services')
+        c = aliased(contracts)
+        s = aliased(services_)
+        pr = aliased(provider)
+        ps = aliased(payment_services_)
+        co = aliased(company)
+        query_filter_service = []
+        js = []
+        if int(idAdress) > 0:
+            js.append(int(idAdress))
+            # query_filter_info.append(a.id.in_(js))
+            query_filter_service.append(s.id_adress_refreshment.in_(js))
+
+        dService = []
+        qService = (select(s.id, s.name_service, s.service_date, s.cost_service, pr.provider)).\
+            select_from(s).join(pr, pr.id == s.id_provider).filter(s.id_contract == int(idContarct)).filter(*query_filter_service)
+        res = session.execute(qService)
+        result = res.all()
+        if result:
+            for s in result:
+                dictPay = []
+                flgPay = 'err'
+                qPay = (select(ps.invoice_number, ps.invoice_cost, ps.invoice_date, co.name)).select_from(ps).\
+                    join(co, co.id == ps.id_company).filter(ps.id_service == int(s.id))
+                resPay = session.execute(qPay)
+                resultPay = resPay.all()
+                if resultPay:
+                    for p in resultPay:
+                        flgPay = 'ok'
+                        dictPay.append({'date': p.invoice_date, 'cost': p.invoice_cost, 'company': p.name,
+                                        'invoice': p.invoice_number})
+                d = {'provider': s.provider, 'service': s.name_service, 'date': s.service_date,
+                     'cost': s.cost_service, 'flgPay': flgPay, 'pay': dictPay}
+                dService.append(d)
+        return dService
+
+def select_contractor(idContarct):
+    with session_factory() as session:
+        print('contractor')
+        c = aliased(contracts)
+        ct = aliased(contractor_)
+        pr = aliased(provider)
+        co = aliased(company)
+        pc = aliased(payment_contractor_)
+        dContractor = []
+        qContractor = (select(ct.id, ct.name_contract, ct.contract_num, ct.contract_date, ct.cost_contract, pr.provider, co.name)). \
+            select_from(ct).join(pr, pr.id == ct.id_provider).join(co, co.id == ct.id_customer).filter(ct.id_contract == int(idContarct))
+        res = session.execute(qContractor)
+        result = res.all()
+        if result:
+            for s in result:
+                dictPay = []
+                flgPay = 'err'
+                qPay = (select(pc.date_payment, pc.cost_payment)).select_from(pc).filter(pc.id_contractor == int(s.id))
+                resPay = session.execute(qPay)
+                resultPay = resPay.all()
+                if resultPay:
+                    for p in resultPay:
+                        flgPay = 'ok'
+                        dictPay.append({'date': p.date_payment, 'cost': p.cost_payment})
+                d = {'provider': s.provider, 'name_contract': s.name_contract, 'date': s.contract_date,
+                     'cost_contract': s.cost_contract, 'contract_num': s.contract_num, 'custamer': s.name,
+                     'flg': flgPay, 'pay': dictPay}
+                dContractor.append(d)
+        print(dContractor)
+        return dContractor
+
+
 def check_prod(rows):
     with session_factory() as session:
         exception_word = ['Доставка товара', 'Подъем']
@@ -246,3 +423,100 @@ def check_prod(rows):
         print(dict)
         print('\n', round(s,6), 'сек.')
         return dict
+
+
+
+
+# region ******* Миграция в PSQL
+def mod_sql_order(dict):
+    with session_factory() as session:
+        session.execute(insert(order), dict);
+        session.flush();
+        session.commit();
+
+
+def mod_sql_payment(dict):
+    with session_factory() as session:
+        dicts = []
+        for d in dict:
+            query = select(order.id).filter_by(id_contract=d['id_contract']).filter_by(id_name=d['id_name']).\
+                filter_by(id_adress_refreshment=int(d['id_refs']))
+            res = session.execute(query).scalars().all()
+            print(res[0], d['id_name'], d['account_number'])
+            s = {'id_order': res[0], 'payment_check': d['payment_check'], 'payment_date': d['payment_date'],
+                 'id_company': d['id_company'], 'account_number': d['account_number'],
+                 'created': d['created'], 'update': d['update']}
+            dicts.append(s)
+        print(dicts)
+        session.execute(insert(payment_), dicts);
+        session.flush();
+        session.commit();
+
+def mod_sql_item_orders(dict):
+    dicts = []
+    with session_factory() as session:
+        for d in dict:
+            query = (select(products)).filter_by(id_product=str(d['id_product']))
+            query2 = (select(order)).filter_by(id_name=str(d['id_name'])).\
+                filter_by(id_contract=int(d['id_contract'])).filter_by(id_adress_refreshment=int(d['id_refs']))
+            product_i = session.execute(query).scalars().all()
+            orders = session.execute(query2).scalars().all()
+            ds = {'id_order': orders[0].id, 'id_product': product_i[0].id, 'cost': d['cost'], 'amount': d['amount'],
+                  'total': d['total'], 'created': d['created'], 'update': d['update'], 'id_old_product':d['id_product']}
+            dicts.append(ds)
+        session.execute(insert(item_orders), dicts);
+        session.flush();
+        session.commit();
+def mod_sql_service(dict, flg):
+    dicts = []
+    with session_factory() as session:
+        session.execute(insert(services_), dict);
+        session.flush();
+        session.commit();
+
+
+def mod_sql_service_pay(dict, flg):
+    dicts = []
+    with session_factory() as session:
+        for d in dict:
+            query_s = (select(services_)).filter_by(temp_col=str(d['temp_col']))
+            temp = session.execute(query_s).scalars().all()
+            ds = {'id_service': temp[0].id, 'id_company': int(d['id_company']), 'invoice_date': d['invoice_date'],
+                  'invoice_number': d['invoice_number'], 'invoice_cost': d['invoice_cost'],
+                  'created': d['created'], 'update': d['update']}
+            dicts.append(ds)
+        session.execute(insert(payment_services_), dicts);
+        session.flush();
+
+        session.commit();
+
+
+def mod_sql_reimburs(dict, flg):
+    with session_factory() as session:
+        print(dict)
+        session.execute(insert(payment_reimburs), dict);
+        session.flush();
+        if flg == False:
+            session.commit();
+            pass
+
+def mod_sql_contractor(dict, flg):
+    with session_factory() as session:
+        session.execute(insert(contractor_), dict);
+        session.flush();
+        session.commit();
+
+def mod_sql_contractor_pay(dict, flg):
+    dicts = []
+    with session_factory() as session:
+        for d in dict:
+            query_s = (select(contractor_)).filter_by(id_contract=int(d['id_contract'])).filter_by(contract_num=str(d['contract_num']))
+            temp = session.execute(query_s).scalars().all()
+            ds = {'id_contractor': temp[0].id, 'date_payment': d['date_payment'], 'cost_payment': d['cost_payment'],
+                  'created': d['created'], 'update': d['update']}
+            dicts.append(ds)
+        session.execute(insert(payment_contractor_), dicts);
+        session.flush();
+        session.commit();
+
+# endregion

@@ -21,9 +21,13 @@ def create_app():
     app.config['UNLOAD_DIR'] = 'uploads/'
     db.init_app(app)
     from auth import auth
+    from auth_psql import auth_psql
     app.register_blueprint(auth, url_prefix='/')
-    from model import users
+    app.register_blueprint(auth_psql, url_prefix='/')
 
+
+
+    from model import users
     login_manager = LoginManager()
     login_manager.login_view = 'auth.login'
     login_manager.init_app(app)

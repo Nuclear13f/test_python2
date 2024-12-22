@@ -47,6 +47,10 @@ def admin():
 def admin_product():
     return render_template('input_product.html', client="dddd")
 
+@auth.route('/admin/testSQL/')
+@login_required
+def admin_testSQL():
+    return render_template('migration_psql_test.html', client="dddd")
 
 @auth.route('/grid/')
 @login_required
@@ -116,8 +120,6 @@ def order():
 def test2():
     str = request.args.get('username')
     str = request.args.get('page')
-    print('Я тута')
-    print(str)
     return redirect('/?page=')
 
 
@@ -234,7 +236,6 @@ def unload_xlsx_input():
             dict = {'status': 'err'}
         else:
             dict = {'status': 'ok', 'data': data}
-        print(dict)
     return jsonify(dict)
 
 
