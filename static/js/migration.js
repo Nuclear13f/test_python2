@@ -1,9 +1,11 @@
 const elemCustomer = document.getElementById('zakazchik_1r_sel')
 const elemContract = document.getElementById('contract_1r_sel')
 const elemAdress = document.getElementById('adress_1r_sel')
+
 const elm_group = document.querySelector('[name="group_item_2111"]')
 const elm_service = document.querySelector('[name="group_item_2112"]')
 const elm_contractor = document.querySelector('[name="group_item_2113"]')
+let elemCouper = document.getElementById('coupler_s111')
 
 // async function func_check(es, e) {
 //     const stat_int = await get_check_stat_product(es).then(data => {
@@ -90,6 +92,7 @@ function clear_items() {
     elm_group.innerHTML = ""
     elm_service.innerHTML = ""
     elm_contractor.innerHTML = ""
+    elemCouper.innerHTML = ""
 }
 
 async function get_orders(id_contract, id_adress = 0, flgAC = true) {
@@ -134,6 +137,23 @@ async function get_orders(id_contract, id_adress = 0, flgAC = true) {
     elm_4.textContent = (result[2]['tbo']).toLocaleString('ru')
     elm_5.textContent = (result[1]['total']).toLocaleString('ru')
     let i = 0
+
+    result[0]['info']['coupler'].forEach(d => {
+        let div_1 = document.createElement('div')
+        let div_2 = document.createElement('div')
+        div_1.classList.add('row')
+        div_1.classList.add('mx-2')
+        div_2.classList.add('col')
+        div_2.classList.add('overflows231s')
+        div_2.classList.add('price_s111')
+        div_2.style.color = '#003d44eb'
+        div_2.textContent = d['name'] + ' - (' + numberWithSpaces(d['price']) + ')'
+
+        div_1.append(div_2)
+        elemCouper.append(div_1)
+    })
+
+
     result[3]['ORDER'].forEach(d => {
         i += 1;
         const results2 = orders(d['order'], d['total'], i, d['items'], d['provider'],
@@ -569,4 +589,23 @@ async function pay_contractor_f(items) {
         '<div class="col-2 s231s" style="font-weight: 900">' + total.toLocaleString('ru') + '</div></div></div>'
     // return html_head + html_row + html_foot
     return html_head + html_row + html_foot
+}
+
+function numberWithSpaces(x) {
+    let price = x.toLocaleString('ru')
+    let num = price.toString().split(",");
+    let decimal = ("" + num[1]).split("").map(Number)
+    if (decimal[0]) {
+        if (decimal.length = 1) {
+            let tmp = num[1] + '0';
+            console.log(tmp);
+            num.pop();
+            num.push(tmp);
+        }
+    }
+    if (num.length < 2) {
+        num.push('00')
+        console.log('2')
+    }
+    return num.join(",")
 }

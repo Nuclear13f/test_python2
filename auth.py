@@ -52,6 +52,12 @@ def admin_product():
 def admin_testSQL():
     return render_template('migration_psql_test.html', client="dddd")
 
+@auth.route('/admin/listSQL/')
+@login_required
+def admin_listSQL():
+    return render_template('listSQL.html', client="dddd")
+
+
 @auth.route('/grid/')
 @login_required
 def grid():

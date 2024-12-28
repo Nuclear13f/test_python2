@@ -95,6 +95,8 @@ class contracts(Base):
     contract_name_file: Mapped[str]
     contract_exeс_period: Mapped[datetime.date]
     note: Mapped[str]
+    year: Mapped[str]
+    flg_mater_c: Mapped[bool]
     client: Mapped['clients'] = relationship(back_populates='contract')
     adress: Mapped['adress_client'] = relationship(back_populates='contract')
     company: Mapped['company'] = relationship(back_populates='contract')
@@ -230,5 +232,25 @@ class payment_contractor_(Base):
     id_contractor: Mapped[int] = mapped_column(ForeignKey('contractor_.id'))
     date_payment: Mapped[datetime.date]
     cost_payment: Mapped[float]
+    created: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
+    update: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
+
+class coupler_contract(Base):
+    __tablename__ = 'coupler_contract'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    id_c_master: Mapped[int] = mapped_column(ForeignKey('contracts.id'))
+    id_c_slave: Mapped[int] = mapped_column(ForeignKey('contracts.id'))
+
+class rent_(Base):
+    __tablename__ = 'rent_'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    id_contract: Mapped[int] = mapped_column(ForeignKey('contracts.id'))
+    id_company: Mapped[int] = mapped_column(ForeignKey('company.id'))
+    id_provider: Mapped[int] = mapped_column(ForeignKey('provider.id'))
+    id_adress_refreshment: Mapped[int]
+    rent_name: Mapped[str]
+    rent_num: Mapped[str]
+    rent_date: Mapped[datetime.date]
+    rent_cost: Mapped[float]
     created: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
     update: Mapped[datetime.datetime] = mapped_column(server_default=func.now())

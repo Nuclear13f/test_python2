@@ -3,7 +3,7 @@ from sqlalchemy.orm import aliased
 from sqlalchemy import Integer, and_, func, insert, select, text, update, func, cast, delete, or_, desc, Float
 from model import type_products, s1_products, s2_products, s3_products, products, provider, order, payment_, \
     item_orders, services_, payment_services_, payment_reimburs, contractor_, payment_contractor_, clients\
-    , contracts, adress_client, adress_refreshment, company
+    , contracts, adress_client, adress_refreshment, company, coupler_contract, rent_
 import time, datetime
 from sqlalchemy.orm import joinedload, selectinload
 
@@ -254,9 +254,26 @@ def select_order(idContarct, idAdress):
         pr = aliased(provider)
         pay = aliased(payment_)
         co = aliased(company)
+        coupler = aliased(coupler_contract)
+
         query_filter_info = []
         query_filter_order = []
+        flgCoupler = False;
         js = []
+        #******* Проверка на slave
+        qCPL = (select(c.flg_mater_c)).filter(c.id == int(idContarct))
+        r_coupler = session.execute(qCPL)
+        res_coupler = r_coupler.first()
+        print('coupler 1 ', res_coupler.flg_mater_c)
+        if res_coupler.flg_mater_c == False:
+            qCPJ = (select(c.id)).select_from(coupler).join(c, c.id == coupler.id_c_master).filter(coupler.id_c_slave == int(idContarct))
+            r_coupler_ = session.execute(qCPJ)
+            res_coupler_ = r_coupler_.first()
+            idContarct = res_coupler_.id
+            flgCoupler = True;
+            print('coupler 2 ', res_coupler_.id)
+        #*************************
+
         if int(idAdress) > 0:
             js.append(int(idAdress))
             # query_filter_info.append(a.id.in_(js))
@@ -267,13 +284,24 @@ def select_order(idContarct, idAdress):
         res = session.execute(qInfo)
         result = res.all()
         adress = [];
+        contact_slave = []
         contract_num = '';
         for d in result:
             contract_num = d[0]
             adress.append({'id': d[2], 'adress': d[1]})
-        s = {'contact_num': contract_num, 'adress': adress}
+        if flgCoupler == True:
+            qCPJ = (select(c.id, c.name_contract, c.contract_price)).select_from(coupler).join(c, c.id == coupler.id_c_slave).\
+                filter(coupler.id_c_master == int(idContarct))
+            r_coupler_ = session.execute(qCPJ)
+            res_coupler_ = r_coupler_.all()
+            for j in res_coupler_:
+                contact_slave.append({'id': j.id, 'name': j.name_contract, 'price': j.contract_price})
+
+        s = {'contact_num': contract_num, 'adress': adress, 'coupler': contact_slave}
         info = {'info': s}
-        print(info)
+
+
+
 
         subq = (select(c.contract_num,
                        func.sum(o.order_total).cast(Float).label('fffff')
@@ -301,7 +329,7 @@ def select_order(idContarct, idAdress):
         dict.append({'total': total})
         dict.append({'tbo': tbo})
 
-        qOrder =  (select(o.id, o.id_name, o.order_date, o.order_total, pr.provider)).\
+        qOrder = (select(o.id, o.id_name, o.order_date, o.order_total, pr.provider)).\
             join(pr, pr.id == o.id_provider).filter(o.id_contract==int(idContarct)).filter(*query_filter_order)
         res = session.execute(qOrder)
         result = res.all()
@@ -420,7 +448,6 @@ def check_prod(rows):
                         dict.append({'id': c1.value, 'product': c2.value, 'flg': 'err'})
         stop = time.time()
         s = stop-start
-        print(dict)
         print('\n', round(s,6), 'сек.')
         return dict
 
@@ -454,6 +481,7 @@ def mod_sql_payment(dict):
 
 def mod_sql_item_orders(dict):
     dicts = []
+    print(dict)
     with session_factory() as session:
         for d in dict:
             query = (select(products)).filter_by(id_product=str(d['id_product']))
@@ -461,9 +489,11 @@ def mod_sql_item_orders(dict):
                 filter_by(id_contract=int(d['id_contract'])).filter_by(id_adress_refreshment=int(d['id_refs']))
             product_i = session.execute(query).scalars().all()
             orders = session.execute(query2).scalars().all()
+
             ds = {'id_order': orders[0].id, 'id_product': product_i[0].id, 'cost': d['cost'], 'amount': d['amount'],
                   'total': d['total'], 'created': d['created'], 'update': d['update'], 'id_old_product':d['id_product']}
             dicts.append(ds)
+            print(dicts)
         session.execute(insert(item_orders), dicts);
         session.flush();
         session.commit();
@@ -517,6 +547,16 @@ def mod_sql_contractor_pay(dict, flg):
             dicts.append(ds)
         session.execute(insert(payment_contractor_), dicts);
         session.flush();
+        print(dict)
         session.commit();
+
+def mod_sql_rent(dict):
+    with session_factory() as session:
+        session.execute(insert(rent_), dict);
+        session.flush();
+        print(dict)
+        session.commit();
+
+
 
 # endregion
